@@ -29,16 +29,29 @@ function LiveBar() {
         const ticker = randomTicker()
         const price = randomPrice()
         const [change, pct_change] = randomChange(price)
+
+        let colorClass = 'text-white'
+        if (change < 0)
+            colorClass = 'text-red-700'
+        else if (change > 0)
+            colorClass = 'text-green-600'
+
         stocks.push(
-            <div key={ticker} className="px-6 py-2">
-                <p>{ticker}<span className="p-2">{price.toFixed(2)}</span></p>
-                <p>{change.toFixed(2)}<span className="p-2">{pct_change.toFixed(2)}</span></p>
+            <div key={ticker} className='px-6 py-2 min-w-48'>
+                <div className='flex justify-between text-white'>
+                    <p>{ticker}</p>
+                    <span className='font-bold'>{price.toFixed(2)}</span>
+                </div>
+                <div className={`flex items-end mt-1 ${colorClass}`}>
+                    <span className='leading-none'>{pct_change.toFixed(2)}%</span>
+                    <span className='pl-2 text-xs'>({change.toFixed(2)})</span>
+                </div>
             </div>
         )
     }
 
     return (
-        <div id="live-bar" className="inline-flex">{stocks}</div>
+        <section id='ticker' className='flex overflow-scroll overflow-y-hidden bg-gray-900'>{stocks}</section>
     )
 }
 
