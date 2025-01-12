@@ -1,4 +1,4 @@
-import './LiveBar.css'
+import './Ticker.css'
 
 function randomTicker(): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -23,7 +23,7 @@ function randomChange(price: number): [number, number] {
     return [diff, pct_change*100]
 }
 
-function LiveBar() {
+function Ticker() {
     const stocks = []
     for (let i = 0; i < 15; i++) {
         const ticker = randomTicker()
@@ -43,7 +43,7 @@ function LiveBar() {
                     <span className='font-bold'>{price.toFixed(2)}</span>
                 </div>
                 <div className={`flex items-end mt-1 ${colorClass}`}>
-                    <span className='leading-none'>{pct_change.toFixed(2)}%</span>
+                    <span className='leading-none text-xl'>{pct_change.toFixed(2)}%</span>
                     <span className='pl-2 text-xs'>({change.toFixed(2)})</span>
                 </div>
             </div>
@@ -51,8 +51,8 @@ function LiveBar() {
     }
 
     return (
-        <section id='ticker' className='flex overflow-scroll overflow-y-hidden bg-gray-900'>{stocks}</section>
+        <section id='ticker' className='flex overflow-scroll overflow-y-hidden bg-gray-900 divide-x divide-gray-700'>{stocks}</section>
     )
 }
 
-export default LiveBar
+export default Ticker
