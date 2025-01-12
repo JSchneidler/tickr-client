@@ -35,13 +35,13 @@ function Ticker() {
     else if (change > 0) colorClass = "text-green-600";
 
     stocks.push(
-      <div key={ticker} className="px-6 py-2 min-w-48">
+      <div key={ticker} className="min-w-48 px-6 py-2">
         <div className="flex justify-between text-white">
           <p>{ticker}</p>
           <span className="font-bold">{price.toFixed(2)}</span>
         </div>
-        <div className={`flex items-end mt-1 ${colorClass}`}>
-          <span className="leading-none text-xl">{pct_change.toFixed(2)}%</span>
+        <div className={`mt-1 flex items-end ${colorClass}`}>
+          <span className="text-xl leading-none">{pct_change.toFixed(2)}%</span>
           <span className="pl-2 text-xs">({change.toFixed(2)})</span>
         </div>
       </div>,
@@ -51,7 +51,7 @@ function Ticker() {
   return (
     <section
       id="ticker"
-      className="flex overflow-scroll overflow-y-hidden bg-gray-900 divide-x divide-gray-700"
+      className="flex divide-x divide-gray-700 overflow-scroll overflow-y-hidden bg-gray-900"
     >
       {stocks}
     </section>

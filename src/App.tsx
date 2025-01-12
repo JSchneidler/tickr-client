@@ -7,7 +7,7 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex h-screen flex-col">
       <Ticker />
       <Routes>
         <Route path="/" element={<Construction />} />
