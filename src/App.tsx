@@ -1,67 +1,35 @@
-import { AppShell, Burger, Button, Group, Skeleton } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-// import { Routes, Route } from "react-router";
+import { AppShell } from "@mantine/core";
+import { Routes, Route } from "react-router";
 
-// import Ticker from "./Ticker";
-// import Construction from "./Construction";
+import Ticker from "./components/Ticker";
+import Construction from "./components/Construction";
 
 import "./App.css";
 
+const HEADER_HEIGHT = 60;
+
 function App() {
-  const [opened, { toggle }] = useDisclosure();
   return (
     <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: "sm",
-        collapsed: { mobile: !opened },
-      }}
+      bg="darkgray"
+      h="100%"
+      header={{ height: HEADER_HEIGHT }}
       padding="md"
     >
-      <AppShell.Header>
-        <Group h="100%" px="md">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        </Group>
+      <AppShell.Header h={HEADER_HEIGHT}>
+        <Ticker />
       </AppShell.Header>
-      <AppShell.Navbar p="md">
-        Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
-      </AppShell.Navbar>
-      <AppShell.Main>
-        <Button onClick={toggle}>Collapse</Button>
-        Main
+      <AppShell.Main h="100%">
+        <Routes>
+          <Route path="/" element={<Construction />} />
+          <Route path="/trade" element={<h1>Trade</h1>} />
+          <Route path="/portfolio" element={<h1>Portfolio</h1>} />
+          <Route path="/account" element={<h1>Account</h1>} />
+          <Route path="/settings" element={<h1>Settings</h1>} />
+        </Routes>
       </AppShell.Main>
     </AppShell>
   );
 }
-
-// function App() {
-//   return (
-//     <div className="flex h-screen flex-col">
-//       {/* <Ticker /> */}
-//       <Routes>
-//         <Route path="/" element={<Construction />} />
-//         <Route path="/trade" element={<h1 className="text-8xl">Trade</h1>} />
-//         <Route
-//           path="/portfolio"
-//           element={<h1 className="text-8xl">Portfolio</h1>}
-//         />
-//         <Route
-//           path="/account"
-//           element={<h1 className="text-8xl">Account</h1>}
-//         />
-//         <Route
-//           path="/settings"
-//           element={<h1 className="text-8xl">Settings</h1>}
-//         />
-//       </Routes>
-//     </div>
-//   );
-// }
 
 export default App;

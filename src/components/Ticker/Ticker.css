@@ -1,0 +1,11 @@
+#ticker {
+  scrollbar-width: none;
+
+  .mantine-ScrollArea-viewport > div {
+    height: 100%;
+  }
+
+  .line-height-1 > * {
+    line-height: 1;
+  }
+}

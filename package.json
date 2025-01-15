@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "prettier . --write && eslint .",
+    "lint": "tsc --noEmit && eslint . && prettier . --write",
     "preview": "vite preview",
     "prepare": "husky"
   },
@@ -17,10 +17,12 @@
     "@mantine/form": "^7.15.3",
     "@mantine/hooks": "^7.15.3",
     "@mantine/notifications": "^7.15.3",
+    "@reduxjs/toolkit": "^2.5.0",
     "dayjs": "^1.11.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
+    "react-redux": "^9.2.0",
     "react-router": "^7.1.1",
     "recharts": "2"
   },
