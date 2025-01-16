@@ -1,7 +1,7 @@
 // import { useEffect } from "react";
 import { Divider, Group, ScrollArea, Stack, Text } from "@mantine/core";
 
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   selectPrices,
   selectStatus,

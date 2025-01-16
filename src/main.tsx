@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router";
 import { MantineProvider } from "@mantine/core";
 import { Provider } from "react-redux";
 
-import { store } from "./store.ts";
+import { store } from "./store";
 
 import App from "./App.tsx";
 

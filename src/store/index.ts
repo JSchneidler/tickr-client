@@ -1,10 +1,12 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 
-import tickerReducer from "./components/Ticker/slice";
+import authReducer from "./authSlice";
+import tickerReducer from "../components/Ticker/slice";
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     ticker: tickerReducer,
   },
 });
