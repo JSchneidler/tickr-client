@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { AppShell } from "@mantine/core";
 import { Routes, Route } from "react-router";
 
-import Header from "./components/Header";
-
 import { useAppDispatch } from "./store/hooks";
 import { check } from "./store/authSlice";
+
+import Header from "./components/Header";
+import StockSearch from "./components/StockSearch";
 
 import "./App.css";
 
@@ -30,7 +31,7 @@ function App() {
       </AppShell.Header>
       <AppShell.Main h="100%">
         <Routes>
-          <Route path="/" element={<h1>Home</h1>} />
+          <Route index path="/" element={<StockSearch />} />
           <Route path="/trade" element={<h1>Trade</h1>} />
           <Route path="/portfolio" element={<h1>Portfolio</h1>} />
           <Route path="/account" element={<h1>Account</h1>} />
