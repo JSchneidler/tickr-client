@@ -8,6 +8,7 @@ export interface User {
   name: string;
   email: string;
   balance: number;
+  deposits: number;
   role: string;
   createdAt: string;
   updatedAt: string;

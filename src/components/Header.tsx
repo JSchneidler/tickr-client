@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   Modal,
+  NumberFormatter,
   PasswordInput,
   TextInput,
 } from "@mantine/core";
@@ -111,7 +112,13 @@ function Header() {
         {!isLoading && isAuthenticated && user && (
           <Group>
             <Text>
-              {user.name}: ${user.balance} (+1.24%)
+              {user.name}:{" "}
+              <NumberFormatter
+                prefix="$"
+                value={user.balance}
+                thousandSeparator
+              />{" "}
+              (+1.24%)
             </Text>
             <Button onClick={() => dispatch(logout())}>Logout</Button>
           </Group>

@@ -6,7 +6,7 @@ import { useAppDispatch } from "./store/hooks";
 import { check } from "./store/authSlice";
 
 import Header from "./components/Header";
-import StockSearch from "./components/StockSearch";
+import SecurityBrowser from "./components/SecurityBrowser";
 
 import "./App.css";
 
@@ -31,7 +31,7 @@ function App() {
       </AppShell.Header>
       <AppShell.Main h="100%">
         <Routes>
-          <Route index path="/" element={<StockSearch />} />
+          <Route index path="/" element={<SecurityBrowser />} />
           <Route path="/trade" element={<h1>Trade</h1>} />
           <Route path="/portfolio" element={<h1>Portfolio</h1>} />
           <Route path="/account" element={<h1>Account</h1>} />
