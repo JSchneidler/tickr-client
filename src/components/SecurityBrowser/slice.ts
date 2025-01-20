@@ -9,20 +9,9 @@ export interface Security {
   name: string;
   displayName: string;
   description: string;
-  mic: string;
-  figi: string;
   createdAt: string;
   updatedAt: string;
   deletedAt: string;
-
-  // Company Info
-  companyName: string | null;
-  companyDescription: string | null;
-  homepageUrl: string | null;
-  marketCap: number | null;
-  sic_code: string | null;
-  sic_description: string | null;
-  total_employees: number | null;
 
   // Quote
   currentPrice: string;
