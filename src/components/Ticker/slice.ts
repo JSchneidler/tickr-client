@@ -4,7 +4,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../store";
 
 export interface Price {
-  symbol: string;
+  coin: string;
   price: number;
   change: number;
   change_percent: number;

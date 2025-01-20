@@ -4,7 +4,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../store";
 
 export interface Security {
-  // Symbol
+  // Coin
   id: number;
   name: string;
   displayName: string;
@@ -42,9 +42,9 @@ export const selectStatus = (state: RootState) => state.securityBrowser.status;
 
 export const fetchSecurity = createAsyncThunk(
   "security/fetch",
-  async (symbol: string, { rejectWithValue }) => {
+  async (coin: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/symbols/${symbol}`, {
+      const response = await fetch(`${API_BASE_URL}/coins/${coin}`, {
         method: "GET",
       });
 
@@ -69,7 +69,7 @@ export const buySecurity = createAsyncThunk(
       const response = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
         body: {
-          symbolId: buyOrder.symbolId,
+          coinId: buyOrder.coinId,
           shares: buyOrder.shares.toString(),
           direction: "SELL",
           type: "MARKET",

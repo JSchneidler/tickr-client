@@ -23,7 +23,7 @@ interface PricesMessage extends WebSocketMessage {
   prices: Prices;
 }
 
-function Symbol(price: Price) {
+function Coin(price: Price) {
   let color = "white";
   if (price.change < 0) color = "red";
   else if (price.change > 0) color = "green";
@@ -31,7 +31,7 @@ function Symbol(price: Price) {
   return (
     <Stack h="100%" miw={100} gap={0} px={10} py={5} justify="space-between">
       <Group justify="space-between" wrap="nowrap" className="line-height-1">
-        <Text c="white">{price.symbol}</Text>
+        <Text c="white">{price.coin}</Text>
         <Text c="white" fw={700}>
           {price.price.toFixed(2)}
         </Text>
@@ -106,8 +106,8 @@ function Ticker() {
         className="divide-x divide-gray-700"
       >
         {prices.map((price, i) => (
-          <div key={price.symbol}>
-            {Symbol(price)}
+          <div key={price.coin}>
+            {Coin(price)}
             {i < prices.length - 1 && (
               <Divider size="xs" orientation="vertical" />
             )}

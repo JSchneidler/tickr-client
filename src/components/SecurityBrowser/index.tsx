@@ -14,8 +14,6 @@ import {
 import { useField } from "@mantine/form";
 import Decimal from "decimal.js";
 
-import SearchSymbols from "./SearchSymbols";
-
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { buySecurity, selectSecurity, selectStatus } from "./slice";
 import { useEffect, useState } from "react";
@@ -63,7 +61,7 @@ function SecurityBrowser() {
   }, [shares, security]);
 
   function buy() {
-    dispatch(buySecurity({ shares, symbolId: security.id }));
+    dispatch(buySecurity({ shares, coinId: security.id }));
   }
 
   function sell() {}
@@ -72,7 +70,6 @@ function SecurityBrowser() {
 
   return (
     <div>
-      <SearchSymbols />
       {status === "loading" && <Loader />}
       {status === "idle" && security && (
         <Container pt={50}>
