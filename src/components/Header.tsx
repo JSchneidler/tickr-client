@@ -8,9 +8,12 @@ import {
   NumberFormatter,
   PasswordInput,
   TextInput,
+  ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { TbSunHigh, TbMoon } from "react-icons/tb";
 
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   register,
   login,
@@ -18,8 +21,8 @@ import {
   selectIsAuthenticated,
   selectIsLoading,
   selectUser,
-} from "../store/authSlice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+} from "../store/userSlice";
+import { selectColorScheme, setColorScheme } from "../store/themeSlice";
 
 import TickrLogo from "../assets/tickr-logo.svg";
 
@@ -28,6 +31,7 @@ function Header() {
   const user = useAppSelector(selectUser);
   const isLoading = useAppSelector(selectIsLoading);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const colorScheme = useAppSelector(selectColorScheme);
 
   const [opened, setOpened] = useState(false);
   const [isRegistration, setIsRegistration] = useState(false);
@@ -109,28 +113,40 @@ function Header() {
       </Modal>
       <Group justify="space-between" align="center" h="100%" px={5}>
         <Image src={TickrLogo} w={50} />
-        {!isLoading && isAuthenticated && user && (
-          <Group>
-            <Text>
-              {user.name}:{" "}
-              <NumberFormatter
-                prefix="$"
-                value={user.balance}
-                thousandSeparator
-              />{" "}
-              (+1.24%)
-            </Text>
-            <Button onClick={() => dispatch(logout())}>Logout</Button>
-          </Group>
-        )}
-        {!isLoading && !isAuthenticated && (
-          <div>
-            <Button onClick={onRegisterClick}>Register</Button>
-            <Button onClick={onLoginClick} ml={5}>
-              Login
-            </Button>
-          </div>
-        )}
+        <Group>
+          {!isLoading && isAuthenticated && user && (
+            <>
+              <Text>
+                {user.name}:{" "}
+                <NumberFormatter
+                  prefix="$"
+                  value={user.balance}
+                  thousandSeparator
+                />{" "}
+                (+1.24%)
+              </Text>
+              <Button onClick={() => dispatch(logout())}>Logout</Button>
+            </>
+          )}
+          {!isLoading && !isAuthenticated && (
+            <>
+              <Button onClick={onRegisterClick}>Register</Button>
+              <Button onClick={onLoginClick} ml={5}>
+                Login
+              </Button>
+            </>
+          )}
+          <ActionIcon
+            onClick={() =>
+              dispatch(
+                setColorScheme(colorScheme === "dark" ? "light" : "dark"),
+              )
+            }
+          >
+            {colorScheme === "dark" && <TbSunHigh />}
+            {colorScheme === "light" && <TbMoon />}
+          </ActionIcon>
+        </Group>
       </Group>
     </>
   );

@@ -16,19 +16,22 @@ export interface Security {
   deletedAt: string;
 
   // Company Info
-  companyName: string;
-  companyDescription: string;
-  homepageUrl: string;
-  marketCap: number;
-  sic_code: string;
-  sic_description: string;
-  total_employees: number;
+  companyName: string | null;
+  companyDescription: string | null;
+  homepageUrl: string | null;
+  marketCap: number | null;
+  sic_code: string | null;
+  sic_description: string | null;
+  total_employees: number | null;
 
   // Quote
-  // price: number;
-  // open_price: number;
-  // change: number;
-  // change_percent: number;
+  currentPrice: string;
+  openPrice: string;
+  change: string;
+  changePercent: string;
+  dayHigh: string;
+  dayLow: string;
+  previousClose: string;
 }
 
 export type Status = "idle" | "loading" | "failed";
@@ -52,13 +55,13 @@ export const fetchSecurity = createAsyncThunk(
   "security/fetch",
   async (symbol: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/symbol/${symbol}`, {
+      const response = await fetch(`${API_BASE_URL}/symbols/${symbol}`, {
         method: "GET",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        return rejectWithValue(error.message);
+        return rejectWithValue(error);
       }
 
       const data = await response.json();
@@ -66,6 +69,30 @@ export const fetchSecurity = createAsyncThunk(
       return data;
     } catch {
       return rejectWithValue("Fetch security failed");
+    }
+  },
+);
+
+export const buySecurity = createAsyncThunk(
+  "security/buy",
+  async (buyOrder, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
+        method: "POST",
+        body: {
+          symbolId: buyOrder.symbolId,
+          shares: buyOrder.shares.toString(),
+          direction: "SELL",
+          type: "MARKET",
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        rejectWithValue(error);
+      }
+    } catch {
+      return rejectWithValue;
     }
   },
 );
@@ -87,11 +114,11 @@ export const securityBrowserSlice = createSlice({
       state.status = "loading";
       // state.error = null;
     });
-    builder.addCase(fetchSecurity.fulfilled, (state, action) => {
+    builder.addCase(fetchSecurity.fulfilled, (state, action: PayloadAction) => {
       state.status = "idle";
       state.security = action.payload;
     });
-    builder.addCase(fetchSecurity.rejected, (state, action) => {
+    builder.addCase(fetchSecurity.rejected, (state, action: PayloadAction) => {
       state.status = "failed";
       // state.error = action.payload as string;
     });

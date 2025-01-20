@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
 import type { RootState } from ".";
@@ -7,8 +7,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  balance: number;
-  deposits: number;
+  balance: string;
+  deposits: string;
   role: string;
   createdAt: string;
   updatedAt: string;
@@ -39,10 +39,10 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const selectUser = (state: RootState) => state.auth.user;
-export const selectIsLoading = (state: RootState) => state.auth.isLoading;
+export const selectUser = (state: RootState) => state.user.user;
+export const selectIsLoading = (state: RootState) => state.user.isLoading;
 export const selectIsAuthenticated = (state: RootState) =>
-  state.auth.isAuthenticated;
+  state.user.isAuthenticated;
 
 export const register = createAsyncThunk(
   "auth/register",
@@ -148,12 +148,12 @@ const authSlice = createSlice({
       state.isLoading = true;
       state.error = null;
     });
-    builder.addCase(register.fulfilled, (state, action) => {
+    builder.addCase(register.fulfilled, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.isAuthenticated = true;
       state.user = action.payload;
     });
-    builder.addCase(register.rejected, (state, action) => {
+    builder.addCase(register.rejected, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });
@@ -163,12 +163,12 @@ const authSlice = createSlice({
       state.isLoading = true;
       state.error = null;
     });
-    builder.addCase(login.fulfilled, (state, action) => {
+    builder.addCase(login.fulfilled, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.isAuthenticated = true;
       state.user = action.payload;
     });
-    builder.addCase(login.rejected, (state, action) => {
+    builder.addCase(login.rejected, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });
@@ -183,7 +183,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
     });
-    builder.addCase(logout.rejected, (state, action) => {
+    builder.addCase(logout.rejected, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });
@@ -193,12 +193,12 @@ const authSlice = createSlice({
       state.isLoading = true;
       state.error = null;
     });
-    builder.addCase(check.fulfilled, (state, action) => {
+    builder.addCase(check.fulfilled, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.isAuthenticated = true;
       state.user = action.payload;
     });
-    builder.addCase(check.rejected, (state, action) => {
+    builder.addCase(check.rejected, (state, action: PayloadAction) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });

@@ -1,7 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
-import { MantineProvider } from "@mantine/core";
 import { Provider } from "react-redux";
 
 import { store } from "./store";
@@ -13,12 +11,8 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <MantineProvider>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </MantineProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>,
 );

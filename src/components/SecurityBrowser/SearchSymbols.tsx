@@ -13,7 +13,7 @@ function SearchSymbols() {
 
   const searchSymbols = async (text: string) => {
     const response = await fetch(
-      `http://localhost:3000/api/symbol/search/${text}`,
+      `http://localhost:3000/api/symbols/search/${text}`,
       {
         method: "GET",
       },
@@ -56,7 +56,7 @@ function SearchSymbols() {
       (security) => security.name === option.value,
     );
     setSearchText(`${security.displayName} - ${security.description}`);
-    dispatch(fetchSecurity(security.name));
+    dispatch(fetchSecurity(security.id));
   };
 
   const getOptions = () =>
@@ -68,7 +68,7 @@ function SearchSymbols() {
     });
 
   useEffect(() => {
-    if (searchText) debouncedSearch(searchText);
+    if (searchText && searchText !== "@") debouncedSearch(searchText);
     else setSecurities([]);
   }, [searchText, debouncedSearch]);
 
