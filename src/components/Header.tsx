@@ -14,24 +14,25 @@ import { useForm } from "@mantine/form";
 import { TbSunHigh, TbMoon } from "react-icons/tb";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import {
-  register,
-  login,
-  logout,
-  selectIsAuthenticated,
-  selectIsLoading,
-  selectUser,
-} from "../store/userSlice";
+import { selectIsAuthenticated, selectUser } from "../store/userSlice";
 import { selectColorScheme, setColorScheme } from "../store/themeSlice";
 
 import TickrLogo from "../assets/tickr-logo.svg";
+import {
+  useLogoutMutation,
+  useLoginMutation,
+  useRegisterMutation,
+} from "../store/api";
 
 function Header() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  const isLoading = useAppSelector(selectIsLoading);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const colorScheme = useAppSelector(selectColorScheme);
+
+  const [register] = useRegisterMutation();
+  const [login] = useLoginMutation();
+  const [logout] = useLogoutMutation();
 
   const [opened, setOpened] = useState(false);
   const [isRegistration, setIsRegistration] = useState(false);
@@ -40,7 +41,7 @@ function Header() {
     email: "",
     password: "",
   };
-  // if (isRegistration) initialValues.name = "";
+  if (isRegistration) initialValues.name = "";
   const form = useForm({
     mode: "uncontrolled",
     initialValues,
@@ -76,10 +77,9 @@ function Header() {
       >
         <form
           onSubmit={form.onSubmit((values) => {
-            // TODO: Move to function
-            dispatch(
-              isRegistration ? register({ ...values }) : login({ ...values }),
-            );
+            // TODO: Move to function, don't close unless success
+            if (isRegistration) register({ ...values });
+            else login({ ...values });
             setOpened(false);
             form.reset();
           })}
@@ -114,7 +114,7 @@ function Header() {
       <Group justify="space-between" align="center" h="100%" px={5}>
         <Image src={TickrLogo} w={50} />
         <Group>
-          {!isLoading && isAuthenticated && user && (
+          {isAuthenticated && user && (
             <>
               <Text>
                 {user.name}:{" "}
@@ -125,10 +125,10 @@ function Header() {
                 />{" "}
                 (+1.24%)
               </Text>
-              <Button onClick={() => dispatch(logout())}>Logout</Button>
+              <Button onClick={() => logout()}>Logout</Button>
             </>
           )}
-          {!isLoading && !isAuthenticated && (
+          {!isAuthenticated && (
             <>
               <Button onClick={onRegisterClick}>Register</Button>
               <Button onClick={onLoginClick} ml={5}>

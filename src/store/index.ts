@@ -1,28 +1,27 @@
-import type { Action, ThunkAction } from "@reduxjs/toolkit";
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createAsyncThunk } from "@reduxjs/toolkit";
 
+import { api } from "./api";
 import user from "./userSlice";
 import theme from "./themeSlice";
-import ticker from "../components/Ticker/slice";
-import securityBrowser from "../components/SecurityBrowser/slice";
-
-export const store = configureStore({
-  reducer: {
-    user,
-    theme,
-    ticker,
-    securityBrowser,
-  },
-});
+// import ticker from "../components/Ticker/slice";
 
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore["getState"]>;
 
 export type AppDispatch = AppStore["dispatch"];
 
-export type AppThunk<ThunkReturnType = void> = ThunkAction<
-  ThunkReturnType,
-  RootState,
-  unknown,
-  Action
->;
+export const store = configureStore({
+  reducer: {
+    [api.reducerPath]: api.reducer,
+    user,
+    theme,
+    // ticker,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(api.middleware),
+});
+
+export const createAppAsyncThunk = createAsyncThunk.withTypes<{
+  state: RootState;
+  dispatch: AppDispatch;
+}>;

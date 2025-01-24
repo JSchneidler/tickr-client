@@ -2,25 +2,39 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import { createTheme, MantineProvider, AppShell } from "@mantine/core";
 
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { check } from "./store/userSlice";
+import { useAppSelector } from "./store/hooks";
 import { selectColorScheme, selectPrimaryColor } from "./store/themeSlice";
 
 import Header from "./components/Header";
-import SecurityBrowser from "./components/SecurityBrowser";
+import Trade from "./components/Trade";
+import {
+  useMeQuery,
+  useGetCoinsQuery,
+  useLazyGetMyHoldingsQuery,
+  useLazyGetMyOrdersQuery,
+} from "./store/api";
 
 import "./App.css";
+import { selectIsAuthenticated } from "./store/userSlice";
 
 const HEADER_HEIGHT = 60;
 
 function App() {
-  const dispatch = useAppDispatch();
+  useMeQuery();
+  useGetCoinsQuery();
+
+  const [fetchHoldings] = useLazyGetMyHoldingsQuery();
+  const [fetchOrders] = useLazyGetMyOrdersQuery();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchHoldings();
+      fetchOrders(true);
+    }
+  }, [isAuthenticated, fetchHoldings, fetchOrders]);
+
   const colorScheme = useAppSelector(selectColorScheme);
   const primaryColor = useAppSelector(selectPrimaryColor);
-
-  useEffect(() => {
-    dispatch(check());
-  }, [dispatch]);
 
   const theme = createTheme({
     primaryColor,
@@ -36,7 +50,7 @@ function App() {
           </AppShell.Header>
           <AppShell.Main h="100%">
             <Routes>
-              <Route index path="/" element={<SecurityBrowser />} />
+              <Route index path="/" element={<Trade />} />
               <Route path="/trade" element={<h1>Trade</h1>} />
               <Route path="/portfolio" element={<h1>Portfolio</h1>} />
               <Route path="/account" element={<h1>Account</h1>} />

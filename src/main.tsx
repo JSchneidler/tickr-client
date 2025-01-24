@@ -7,6 +7,7 @@ import { store } from "./store";
 import App from "./App.tsx";
 
 import "@mantine/core/styles.css";
+import "@mantine/charts/styles.css";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
