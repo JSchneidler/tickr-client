@@ -1,17 +1,22 @@
-import { Table } from "@mantine/core";
+import { useMemo } from "react";
+import { TbTrash } from "react-icons/tb";
+import { ActionIcon, Table } from "@mantine/core";
 
-import { useGetMyOrdersQuery } from "../../store/api";
+import { useDeleteOrderMutation, useGetMyOrdersQuery } from "../../store/api";
 
 interface OrdersProps {
   coinId?: number;
 }
 
 function Orders({ coinId }: OrdersProps) {
-  const { orders } = useGetMyOrdersQuery(true, {
-    selectFromResult: ({ data }) => ({
-      orders: data?.filter((order) => order.coinId === coinId),
-    }),
-  });
+  const { data: allOrders = [] } = useGetMyOrdersQuery();
+  const [deleteOrder] = useDeleteOrderMutation();
+
+  const orders = useMemo(() => {
+    return allOrders.filter((order) => {
+      return order.coinId === coinId && order.filled === false;
+    });
+  }, [coinId, allOrders]);
 
   if (orders?.length === 0) return;
 
@@ -19,7 +24,17 @@ function Orders({ coinId }: OrdersProps) {
     <Table.Tr key={order.id}>
       <Table.Td>{order.direction}</Table.Td>
       <Table.Td>{order.type}</Table.Td>
+      <Table.Td>{order.price}</Table.Td>
       <Table.Td>{order.shares}</Table.Td>
+      <Table.Td>
+        <ActionIcon
+          onClick={() => deleteOrder(order.id)}
+          c="red"
+          variant="subtle"
+        >
+          <TbTrash />
+        </ActionIcon>
+      </Table.Td>
     </Table.Tr>
   ));
 
@@ -29,6 +44,7 @@ function Orders({ coinId }: OrdersProps) {
         <Table.Tr>
           <Table.Th>Direction</Table.Th>
           <Table.Th>Type</Table.Th>
+          <Table.Th>Price</Table.Th>
           <Table.Th>Shares</Table.Th>
         </Table.Tr>
       </Table.Thead>

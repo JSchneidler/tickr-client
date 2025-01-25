@@ -75,23 +75,23 @@ function Ticker() {
   //   ws.connect();
   // }, [dispatch]);
 
-  useWebSocket({
-    url: "ws://localhost:3000/ws",
-    onMessage: (message) => {
-      if (message.type !== "prices") return;
+  // useWebSocket({
+  //   url: "ws://localhost:3000/ws",
+  //   onMessage: (message) => {
+  //     if (message.type !== "prices") return;
 
-      try {
-        const latestPrices = (message as PricesMessage).prices;
-        const newPrices: Price[] = [];
-        for (const key in latestPrices) newPrices.push(latestPrices[key]);
+  //     try {
+  //       const latestPrices = (message as PricesMessage).prices;
+  //       const newPrices: Price[] = [];
+  //       for (const key in latestPrices) newPrices.push(latestPrices[key]);
 
-        dispatch(setPrices(newPrices));
-        dispatch(setStatus("idle"));
-      } catch (err) {
-        console.error(err);
-      }
-    },
-  });
+  //       dispatch(setPrices(newPrices));
+  //       dispatch(setStatus("idle"));
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   },
+  // });
 
   const alpha = status === "idle" ? "0.9" : "0.3";
 

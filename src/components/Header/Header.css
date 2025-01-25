@@ -1,0 +1,9 @@
+#logo {
+  .primary {
+    fill: red;
+  }
+
+  .secondary {
+    fill: white;
+  }
+}

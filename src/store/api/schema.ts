@@ -22,6 +22,7 @@ export interface Coin {
   externalId: string;
   name: string;
   displayName: string;
+  imageUrl: string;
   description: string;
   createdAt: string;
   updatedAt: string;
@@ -62,11 +63,14 @@ export enum OrderDirection {
 
 export enum OrderType {
   MARKET = "MARKET",
+  LIMIT = "LIMIT",
+  STOP = "STOP",
+  TRAILING_STOP = "TRAILING_STOP",
 }
 
 export interface OrderRequest {
   coinId: number;
-  shares: string;
+  shares?: string;
   price?: string;
   direction: OrderDirection;
   type: OrderType;
@@ -82,4 +86,9 @@ export interface Order extends OrderRequest {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+}
+
+export interface LivePrice {
+  coinId: number;
+  price: string | null;
 }

@@ -13,23 +13,22 @@ import {
 import { useForm } from "@mantine/form";
 import { TbSunHigh, TbMoon } from "react-icons/tb";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectIsAuthenticated, selectUser } from "../store/userSlice";
-import { selectColorScheme, setColorScheme } from "../store/themeSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectColorScheme, setColorScheme } from "../../store/themeSlice";
 
-import TickrLogo from "../assets/tickr-logo.svg";
+import TickrLogo from "../../assets/tickr-logo.svg";
 import {
   useLogoutMutation,
   useLoginMutation,
   useRegisterMutation,
-} from "../store/api";
+  useMeQuery,
+} from "../../store/api";
 
 function Header() {
   const dispatch = useAppDispatch();
-  const user = useAppSelector(selectUser);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const colorScheme = useAppSelector(selectColorScheme);
 
+  const { data: user } = useMeQuery();
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
   const [logout] = useLogoutMutation();
@@ -112,9 +111,9 @@ function Header() {
         </form>
       </Modal>
       <Group justify="space-between" align="center" h="100%" px={5}>
-        <Image src={TickrLogo} w={50} />
+        <Image src={TickrLogo} w={50} id="logo" />
         <Group>
-          {isAuthenticated && user && (
+          {user && (
             <>
               <Text>
                 {user.name}:{" "}
@@ -128,7 +127,7 @@ function Header() {
               <Button onClick={() => logout()}>Logout</Button>
             </>
           )}
-          {!isAuthenticated && (
+          {!user && (
             <>
               <Button onClick={onRegisterClick}>Register</Button>
               <Button onClick={onLoginClick} ml={5}>

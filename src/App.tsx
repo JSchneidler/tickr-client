@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { createTheme, MantineProvider, AppShell } from "@mantine/core";
+import {
+  createTheme,
+  DEFAULT_THEME,
+  MantineProvider,
+  AppShell,
+  mergeMantineTheme,
+} from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 
 import { useAppSelector } from "./store/hooks";
 import { selectColorScheme, selectPrimaryColor } from "./store/themeSlice";
@@ -15,34 +22,36 @@ import {
 } from "./store/api";
 
 import "./App.css";
-import { selectIsAuthenticated } from "./store/userSlice";
 
 const HEADER_HEIGHT = 60;
 
 function App() {
-  useMeQuery();
+  const { data: user } = useMeQuery();
   useGetCoinsQuery();
 
   const [fetchHoldings] = useLazyGetMyHoldingsQuery();
   const [fetchOrders] = useLazyGetMyOrdersQuery();
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       fetchHoldings();
-      fetchOrders(true);
+      fetchOrders();
     }
-  }, [isAuthenticated, fetchHoldings, fetchOrders]);
+  }, [user, fetchHoldings, fetchOrders]);
 
   const colorScheme = useAppSelector(selectColorScheme);
   const primaryColor = useAppSelector(selectPrimaryColor);
 
-  const theme = createTheme({
-    primaryColor,
-    fontFamily: "Verdana, sans-serif",
-  });
+  const theme = mergeMantineTheme(
+    DEFAULT_THEME,
+    createTheme({
+      primaryColor,
+      fontFamily: "Verdana, sans-serif",
+    }),
+  );
 
   return (
     <MantineProvider theme={theme} forceColorScheme={colorScheme}>
+      <Notifications />
       <BrowserRouter>
         <AppShell h="100%" header={{ height: HEADER_HEIGHT }} padding="md">
           <AppShell.Header>

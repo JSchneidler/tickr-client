@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createSelector } from "@reduxjs/toolkit";
+import { TypedUseQueryStateResult } from "@reduxjs/toolkit/query/react";
 import {
   Title,
   // Loader,
@@ -7,7 +9,7 @@ import {
   Divider,
   Stack,
   Group,
-  NumberFormatter,
+  Center,
 } from "@mantine/core";
 import Decimal from "decimal.js";
 
@@ -16,22 +18,16 @@ import { useGetCoinQuery, useGetMyHoldingsQuery } from "../../store/api";
 import { Holding } from "../../store/api/schema";
 import Orders from "./Orders";
 import TradeForm from "./TradeForm";
-import { TypedUseQueryStateResult } from "@reduxjs/toolkit/query/react";
-import { createSelector } from "@reduxjs/toolkit";
 import Chart from "./Chart";
+import Dollars from "../Dollars";
+import Gain from "../Gain";
+import { useAppSelector } from "../../store/hooks";
+import { selectById } from "../../store/livePrices";
 
 interface InfoProps {
   label: string;
   element: JSX.Element;
 }
-
-const Dollars = (value: string) => (
-  <NumberFormatter
-    prefix="$"
-    value={new Decimal(value).toDecimalPlaces(2).toString()}
-    thousandSeparator
-  />
-);
 
 function Info({ label, element }: InfoProps) {
   return (
@@ -48,7 +44,7 @@ type GetHoldingSelectFromResultArg = TypedUseQueryStateResult<
   any
 >;
 
-const selectHoldingForCoin = createSelector(
+export const selectHoldingForCoin = createSelector(
   (res: GetHoldingSelectFromResultArg) => res.data,
   (_: GetHoldingSelectFromResultArg, coinId?: number) => coinId,
   (holdings, coinId) => holdings?.find((holding) => holding.coinId === coinId),
@@ -57,7 +53,8 @@ const selectHoldingForCoin = createSelector(
 function Trade() {
   const [coinId, setCoinId] = useState<number>();
 
-  const { data: coin } = useGetCoinQuery(coinId!, { skip: !coinId });
+  const { data: coin } = useGetCoinQuery(coinId, { skip: !coinId });
+  const livePrice = useAppSelector((state) => selectById(state, coinId));
 
   const { holding } = useGetMyHoldingsQuery(undefined, {
     selectFromResult: (result) => ({
@@ -69,33 +66,62 @@ function Trade() {
     <div>
       <CoinSelector onCoinSelect={(id) => setCoinId(+id)} />
       {coin && (
-        <Container pt={50}>
+        <Container size="xl" pt={50}>
           <Title order={2}>
             {coin.displayName} ({coin.name})
           </Title>
-          <Title>{Dollars(coin.currentPrice)}</Title>
+          <Title>
+            <Dollars
+              value={
+                livePrice && livePrice.price
+                  ? livePrice.price
+                  : coin.currentPrice
+              }
+            />
+            <Gain change={coin.change} changePercent={coin.changePercent} />
+          </Title>
           <Divider m={10} />
           <Group justify="space-between" align="flex-start" grow>
             <Stack>
               <Chart coinId={coinId} />
               <Info
                 label="Previous Close"
-                element={Dollars(coin.previousClose)}
+                element={<Dollars value={coin.previousClose} />}
               />
-              <Info label="Open" element={Dollars(coin.previousClose)} />
+              <Info
+                label="Open"
+                element={<Dollars value={coin.previousClose} />}
+              />
               <Info
                 label="Range"
                 element={
                   <>
-                    {Dollars(coin.dayLow)} - {Dollars(coin.dayHigh)}
+                    {<Dollars value={coin.dayLow} />} -{" "}
+                    {<Dollars value={coin.dayHigh} />}
                   </>
                 }
               />
             </Stack>
             <Stack>
               <TradeForm coinId={coinId} />
-              <Title order={4}>Holdings</Title>
-              {holding && <Text>{holding.shares}</Text>}
+              <Divider m={10} />
+              <Center>
+                <Title>
+                  {!holding && "No owned shares"}
+                  {holding && (
+                    <>
+                      {holding.shares} shares (
+                      <Dollars
+                        value={new Decimal(holding.shares)
+                          .mul(coin.currentPrice)
+                          .toDecimalPlaces(2)
+                          .toString()}
+                      />
+                      )
+                    </>
+                  )}
+                </Title>
+              </Center>
               <Divider m={10} />
               <Title order={4}>Active Orders</Title>
               <Orders coinId={coinId} />
