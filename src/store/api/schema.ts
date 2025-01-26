@@ -31,12 +31,15 @@ export interface Coin {
 
 export interface CoinWithQuote extends Coin {
   currentPrice: string;
-  openPrice: string;
   dayHigh: string;
   dayLow: string;
-  previousClose: string;
   change: string;
   changePercent: string;
+}
+
+export interface CoinHistoricalDataRequest {
+  coinId: number;
+  daysAgo: number;
 }
 
 type HistoricalData = [number, number][];
@@ -51,6 +54,7 @@ export interface Holding {
   userId: number;
   coinId: number;
   shares: string;
+  cost: string;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;

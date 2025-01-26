@@ -31,13 +31,22 @@ type MessageListener = (payload: any) => void;
 export class WebSocketClient {
   private socket: WebSocket = new WebSocket("ws://localhost:3000/api/ws");
 
-  constructor() {
+  connect() {
+    if (!this.socket.CLOSED) return;
+
+    this.socket = new WebSocket("ws://localhost:3000/api/ws");
     this.socket.onopen = () => {
       console.log("Connected to WebSocket");
     };
   }
 
+  disconnect() {
+    this.socket.close();
+  }
+
   listen(type: WebSocketMessageType, listener: MessageListener) {
+    if (!this.socket.OPEN) throw Error("Not connected to WebSocket");
+
     const internalListener = (event: MessageEvent) => {
       const message = JSON.parse(event.data) as WebSocketMessage;
 
@@ -48,5 +57,3 @@ export class WebSocketClient {
     return () => this.socket.removeEventListener("message", internalListener);
   }
 }
-
-export default new WebSocketClient();

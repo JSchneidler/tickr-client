@@ -10,7 +10,7 @@ import {
 import { Notifications } from "@mantine/notifications";
 
 import { useAppSelector } from "./store/hooks";
-import { selectColorScheme, selectPrimaryColor } from "./store/themeSlice";
+import { selectPrimaryColor } from "./store/themeSlice";
 
 import Header from "./components/Header";
 import Trade from "./components/Trade";
@@ -31,6 +31,7 @@ function App() {
 
   const [fetchHoldings] = useLazyGetMyHoldingsQuery();
   const [fetchOrders] = useLazyGetMyOrdersQuery();
+
   useEffect(() => {
     if (user) {
       fetchHoldings();
@@ -38,7 +39,6 @@ function App() {
     }
   }, [user, fetchHoldings, fetchOrders]);
 
-  const colorScheme = useAppSelector(selectColorScheme);
   const primaryColor = useAppSelector(selectPrimaryColor);
 
   const theme = mergeMantineTheme(
@@ -50,7 +50,7 @@ function App() {
   );
 
   return (
-    <MantineProvider theme={theme} forceColorScheme={colorScheme}>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
       <Notifications />
       <BrowserRouter>
         <AppShell h="100%" header={{ height: HEADER_HEIGHT }} padding="md">

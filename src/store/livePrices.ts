@@ -20,8 +20,7 @@ const livePricesSlice = createSlice({
   },
 });
 
-export const { selectById } = pricesAdapter.getSelectors<RootState>(
-  (state) => state.livePrices,
-);
+export const { selectById, selectEntities } =
+  pricesAdapter.getSelectors<RootState>((state) => state.livePrices);
 export const { pricesUpdated } = livePricesSlice.actions;
 export default livePricesSlice.reducer;

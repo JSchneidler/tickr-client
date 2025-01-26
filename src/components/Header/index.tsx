@@ -2,19 +2,16 @@ import { useState } from "react";
 import {
   Image,
   Group,
-  Text,
   Button,
   Modal,
-  NumberFormatter,
   PasswordInput,
   TextInput,
   ActionIcon,
+  useMantineColorScheme,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { TbSunHigh, TbMoon } from "react-icons/tb";
-
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectColorScheme, setColorScheme } from "../../store/themeSlice";
 
 import TickrLogo from "../../assets/tickr-logo.svg";
 import {
@@ -23,18 +20,25 @@ import {
   useRegisterMutation,
   useMeQuery,
 } from "../../store/api";
+import { usePortfolioValue } from "../../hooks/usePortfolioValue";
+import Dollars from "../Dollars";
+import Gain from "../Gain";
 
 function Header() {
-  const dispatch = useAppDispatch();
-  const colorScheme = useAppSelector(selectColorScheme);
-
   const { data: user } = useMeQuery();
   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
   const [logout] = useLogoutMutation();
 
+  const portfolioValue = usePortfolioValue();
+
   const [opened, setOpened] = useState(false);
   const [isRegistration, setIsRegistration] = useState(false);
+
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("dark", {
+    getInitialValueInEffect: true,
+  });
 
   const initialValues = {
     email: "",
@@ -114,18 +118,19 @@ function Header() {
         <Image src={TickrLogo} w={50} id="logo" />
         <Group>
           {user && (
-            <>
-              <Text>
-                {user.name}:{" "}
-                <NumberFormatter
-                  prefix="$"
-                  value={user.balance}
-                  thousandSeparator
-                />{" "}
-                (+1.24%)
-              </Text>
+            <div>
+              {user.name}: <Dollars value={user.balance} />|
+              {portfolioValue && (
+                <div>
+                  <Dollars value={portfolioValue.value} />
+                  <Gain
+                    change={portfolioValue.change}
+                    changePercent={portfolioValue.changePercent}
+                  />
+                </div>
+              )}
               <Button onClick={() => logout()}>Logout</Button>
-            </>
+            </div>
           )}
           {!user && (
             <>
@@ -137,13 +142,11 @@ function Header() {
           )}
           <ActionIcon
             onClick={() =>
-              dispatch(
-                setColorScheme(colorScheme === "dark" ? "light" : "dark"),
-              )
+              setColorScheme(computedColorScheme === "dark" ? "light" : "dark")
             }
           >
-            {colorScheme === "dark" && <TbSunHigh />}
-            {colorScheme === "light" && <TbMoon />}
+            {computedColorScheme === "dark" && <TbSunHigh />}
+            {computedColorScheme === "light" && <TbMoon />}
           </ActionIcon>
         </Group>
       </Group>

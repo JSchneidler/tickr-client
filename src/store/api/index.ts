@@ -4,12 +4,12 @@ import {
   User,
   RegisterRequest,
   LoginRequest,
-  Coin,
   CoinWithQuote,
   Holding,
   Order,
   OrderRequest,
   CoinHistoricalData,
+  CoinHistoricalDataRequest,
 } from "./schema";
 
 export const api = createApi({
@@ -41,23 +41,34 @@ export const api = createApi({
         url: "/auth/logout",
         method: "POST",
       }),
-      invalidatesTags: ["User"],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+
+          dispatch(api.util.resetApiState()); // TODO: Clear all private state (user, orders, holdings)
+        } catch (error) {
+          console.error("Logout failed:", error);
+        }
+      },
     }),
     me: builder.query<User | undefined, void>({
       query: () => "/me",
-      providesTags: ["User"], // TODO: Doesn't provide tag if fails?
+      providesTags: ["User"],
     }),
 
     // Coins
-    getCoins: builder.query<Coin[], void>({
+    getCoins: builder.query<CoinWithQuote[], void>({
       query: () => "/coins",
       providesTags: ["Coin"],
     }),
     getCoin: builder.query<CoinWithQuote, number>({
       query: (coinId) => `/coins/${coinId}`,
     }),
-    getCoinHistoricalData: builder.query<CoinHistoricalData, number>({
-      query: (coinId) => `/coins/${coinId}/historical`,
+    getCoinHistoricalData: builder.query<
+      CoinHistoricalData,
+      CoinHistoricalDataRequest
+    >({
+      query: ({ coinId, daysAgo }) => `/coins/${coinId}/historical/${daysAgo}`,
     }),
 
     // Holdings
@@ -77,8 +88,8 @@ export const api = createApi({
         method: "POST",
         body: orderRequest,
       }),
-      async onQueryStarted(order, lifecycleApi) {
-        lifecycleApi.dispatch(
+      async onQueryStarted(order, { dispatch }) {
+        dispatch(
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             draft.push({ ...order, id: 0, filled: false });
           }),
@@ -91,8 +102,8 @@ export const api = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["Order"],
-      async onQueryStarted(orderId, lifecycleApi) {
-        lifecycleApi.dispatch(
+      async onQueryStarted(orderId, { dispatch }) {
+        dispatch(
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             Object.assign(
               draft,

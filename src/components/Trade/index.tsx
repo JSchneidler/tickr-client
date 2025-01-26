@@ -14,15 +14,18 @@ import {
 import Decimal from "decimal.js";
 
 import CoinSelector from "../CoinSelector";
-import { useGetCoinQuery, useGetMyHoldingsQuery } from "../../store/api";
+import {
+  useGetCoinQuery,
+  useGetMyHoldingsQuery,
+  useMeQuery,
+} from "../../store/api";
 import { Holding } from "../../store/api/schema";
 import Orders from "./Orders";
 import TradeForm from "./TradeForm";
 import Chart from "./Chart";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
-import { useAppSelector } from "../../store/hooks";
-import { selectById } from "../../store/livePrices";
+import { useLivePrice } from "../../hooks/useLivePrice";
 
 interface InfoProps {
   label: string;
@@ -53,8 +56,9 @@ export const selectHoldingForCoin = createSelector(
 function Trade() {
   const [coinId, setCoinId] = useState<number>();
 
+  const { data: user } = useMeQuery();
   const { data: coin } = useGetCoinQuery(coinId, { skip: !coinId });
-  const livePrice = useAppSelector((state) => selectById(state, coinId));
+  const { price, change, changePercent } = useLivePrice(coinId);
 
   const { holding } = useGetMyHoldingsQuery(undefined, {
     selectFromResult: (result) => ({
@@ -71,27 +75,13 @@ function Trade() {
             {coin.displayName} ({coin.name})
           </Title>
           <Title>
-            <Dollars
-              value={
-                livePrice && livePrice.price
-                  ? livePrice.price
-                  : coin.currentPrice
-              }
-            />
-            <Gain change={coin.change} changePercent={coin.changePercent} />
+            <Dollars value={price} />
+            <Gain change={change} changePercent={changePercent} />
           </Title>
           <Divider m={10} />
           <Group justify="space-between" align="flex-start" grow>
             <Stack>
-              <Chart coinId={coinId} />
-              <Info
-                label="Previous Close"
-                element={<Dollars value={coin.previousClose} />}
-              />
-              <Info
-                label="Open"
-                element={<Dollars value={coin.previousClose} />}
-              />
+              {coinId && <Chart coinId={coinId} />}
               <Info
                 label="Range"
                 element={
@@ -102,30 +92,32 @@ function Trade() {
                 }
               />
             </Stack>
-            <Stack>
-              <TradeForm coinId={coinId} />
-              <Divider m={10} />
-              <Center>
-                <Title>
-                  {!holding && "No owned shares"}
-                  {holding && (
-                    <>
-                      {holding.shares} shares (
-                      <Dollars
-                        value={new Decimal(holding.shares)
-                          .mul(coin.currentPrice)
-                          .toDecimalPlaces(2)
-                          .toString()}
-                      />
-                      )
-                    </>
-                  )}
-                </Title>
-              </Center>
-              <Divider m={10} />
-              <Title order={4}>Active Orders</Title>
-              <Orders coinId={coinId} />
-            </Stack>
+            {user && (
+              <Stack>
+                <TradeForm coinId={coinId} />
+                <Divider m={10} />
+                <Center>
+                  <Title order={3}>
+                    {!holding && "No owned shares"}
+                    {holding && (
+                      <>
+                        {holding.shares} shares (
+                        <Dollars
+                          value={new Decimal(holding.shares)
+                            .mul(coin.currentPrice)
+                            .toDecimalPlaces(2)
+                            .toString()}
+                        />
+                        ) at cost average of <Dollars value={holding.cost} />
+                      </>
+                    )}
+                  </Title>
+                </Center>
+                <Divider m={10} />
+                <Title order={4}>Active Orders</Title>
+                <Orders coinId={coinId} />
+              </Stack>
+            )}
           </Group>
           <Divider m={10} />
           <Text>{coin.description}</Text>

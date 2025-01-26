@@ -11,8 +11,7 @@ import {
 import { useGetCoinQuery, useGetCoinsQuery } from "../../store/api";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
-import { selectById } from "../../store/livePrices";
-import { useAppSelector } from "../../store/hooks";
+import { useLivePrice } from "../../hooks/useLivePrice";
 
 export type OnCoinSelect = (coinId: string) => void;
 
@@ -22,7 +21,7 @@ interface CoinProps {
 
 function Coin({ coinId }: CoinProps) {
   const { data: coin } = useGetCoinQuery(coinId);
-  const livePrice = useAppSelector((state) => selectById(state, coinId));
+  const { price, change, changePercent } = useLivePrice(coinId);
 
   if (!coin) return;
 
@@ -33,12 +32,8 @@ function Coin({ coinId }: CoinProps) {
         <Title order={4}>{coin.displayName}</Title>
       </Group>
       <Title order={5}>
-        <Dollars
-          value={
-            livePrice && livePrice.price ? livePrice.price : coin.currentPrice
-          }
-        />
-        <Gain change={coin.change} changePercent={coin.changePercent} />
+        <Dollars value={price} />
+        <Gain change={change} changePercent={changePercent} />
       </Title>
     </Stack>
   );
