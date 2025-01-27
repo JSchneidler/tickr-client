@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { createSelector } from "@reduxjs/toolkit";
-import { TypedUseQueryStateResult } from "@reduxjs/toolkit/query/react";
 import {
   Title,
   // Loader,
@@ -19,13 +17,13 @@ import {
   useGetMyHoldingsQuery,
   useMeQuery,
 } from "../../store/api";
-import { Holding } from "../../store/api/schema";
 import Orders from "./Orders";
 import TradeForm from "./TradeForm";
 import Chart from "./Chart";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
 import { useLivePrice } from "../../hooks/useLivePrice";
+import { selectHoldingForCoin } from "../../store/selectors";
 
 interface InfoProps {
   label: string;
@@ -40,18 +38,6 @@ function Info({ label, element }: InfoProps) {
     </Group>
   );
 }
-
-type GetHoldingSelectFromResultArg = TypedUseQueryStateResult<
-  Holding[],
-  any,
-  any
->;
-
-export const selectHoldingForCoin = createSelector(
-  (res: GetHoldingSelectFromResultArg) => res.data,
-  (_: GetHoldingSelectFromResultArg, coinId?: number) => coinId,
-  (holdings, coinId) => holdings?.find((holding) => holding.coinId === coinId),
-);
 
 function Trade() {
   const [coinId, setCoinId] = useState<number>();

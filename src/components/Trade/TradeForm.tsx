@@ -19,7 +19,7 @@ import {
 } from "../../store/api";
 import { OrderDirection, OrderType } from "../../store/api/schema";
 import Dollars from "../Dollars";
-import { selectHoldingForCoin } from ".";
+import { selectHoldingForCoin } from "../../store/selectors";
 
 enum QuantityType {
   SHARES,

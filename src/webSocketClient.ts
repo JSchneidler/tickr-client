@@ -3,16 +3,20 @@ export enum WebSocketMessageType {
   WATCH = "WATCH",
 }
 
+type Payload = PriceUpdate | OrderFilled;
+
 export interface WebSocketMessage {
   type: WebSocketMessageType;
-  payload: any;
+  payload: Payload;
 }
 
-export interface OrderFilledMessage {
+export interface OrderFilled {
+  id: number;
+}
+
+export interface OrderFilledMessage extends WebSocketMessage {
   type: WebSocketMessageType.ORDER_FILLED;
-  payload: {
-    id: number;
-  };
+  payload: OrderFilled;
 }
 
 export interface PriceUpdate {
@@ -21,12 +25,12 @@ export interface PriceUpdate {
   low: string;
 }
 
-export interface WatchMessage {
+export interface WatchMessage extends WebSocketMessage {
   type: WebSocketMessageType.WATCH;
   payload: PriceUpdate;
 }
 
-type MessageListener = (payload: any) => void;
+type MessageListener = (payload: Payload) => void;
 
 export class WebSocketClient {
   private socket: WebSocket = new WebSocket("ws://localhost:3000/api/ws");

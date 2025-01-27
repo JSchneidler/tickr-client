@@ -5,8 +5,10 @@ import { WebSocketClient, WebSocketMessageType } from "../webSocketClient";
 import { LivePrice, Order } from "./api/schema";
 import { api } from "./api";
 import { pricesUpdated } from "./livePrices";
+import { RootState } from ".";
 
-export const webSocketMiddleware: Middleware<{}, any> = (store) => {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export const webSocketMiddleware: Middleware<{}, RootState> = (store) => {
   const webSocketClient = new WebSocketClient();
 
   function attachListeners() {
