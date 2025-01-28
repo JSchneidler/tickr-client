@@ -1,8 +1,8 @@
 import { Order } from "./store/api/schema";
 
 export enum WebSocketMessageType {
-  ORDER_FILLED,
-  WATCH,
+  ORDER_FILLED = "ORDER_FILLED",
+  WATCH = "WATCH",
 }
 
 export interface PriceUpdate {
