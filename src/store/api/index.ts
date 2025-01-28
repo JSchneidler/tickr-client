@@ -36,7 +36,7 @@ export const api = createApi({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "Holding", "Order"],
     }),
     logout: builder.mutation<void, void>({
       query: () => ({

@@ -15,6 +15,7 @@ export interface User {
   role: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
 }
 
 export interface Coin {
@@ -42,7 +43,7 @@ export interface CoinHistoricalDataRequest {
   daysAgo: number;
 }
 
-type HistoricalData = [number, number][];
+type HistoricalData = [number, string][];
 export interface CoinHistoricalData {
   prices: HistoricalData;
   marketCaps: HistoricalData;
@@ -68,8 +69,6 @@ export enum OrderDirection {
 export enum OrderType {
   MARKET = "MARKET",
   LIMIT = "LIMIT",
-  STOP = "STOP",
-  TRAILING_STOP = "TRAILING_STOP",
 }
 
 export interface Order {

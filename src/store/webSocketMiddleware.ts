@@ -50,7 +50,6 @@ export const webSocketMiddleware: Middleware<{}, RootState> = (store) => {
     ) {
       webSocketClient.disconnect();
       webSocketClient.connect();
-      attachListeners();
     }
 
     return next(action);
