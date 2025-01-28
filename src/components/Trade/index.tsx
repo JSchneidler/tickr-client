@@ -42,12 +42,12 @@ function Trade() {
       />
       {coin && (
         <Container size="xl" pt={50}>
-          <Title order={2}>
+          <Title order={3} fw="normal">
             {coin.displayName} ({coin.name})
           </Title>
           <Title>
-            <Dollars value={price} />
-            <Gain change={change} changePercent={changePercent} />
+            <Dollars value={price} size="xl" fw="bolder" />
+            <Gain change={change} changePercent={changePercent} size="md" />
           </Title>
           <Divider m={10} />
           <Group justify="space-between" align="flex-start" grow>
@@ -56,10 +56,10 @@ function Trade() {
               <Info
                 label="Range"
                 element={
-                  <>
+                  <span>
                     {<Dollars value={coin.dayLow} />} -{" "}
                     {<Dollars value={coin.dayHigh} />}
-                  </>
+                  </span>
                 }
               />
             </Stack>

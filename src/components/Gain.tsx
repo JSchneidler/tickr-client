@@ -1,4 +1,4 @@
-import { Text } from "@mantine/core";
+import { Text, TextProps } from "@mantine/core";
 import Decimal from "decimal.js";
 
 interface GainProps {
@@ -6,7 +6,7 @@ interface GainProps {
   changePercent?: string;
 }
 
-function Gain({ change, changePercent }: GainProps) {
+function Gain({ change, changePercent, ...rest }: GainProps & TextProps) {
   if (!change || !changePercent) return;
 
   const changeDecimal = new Decimal(changePercent);
@@ -17,9 +17,9 @@ function Gain({ change, changePercent }: GainProps) {
   else if (changeDecimal.lt(0)) color = "red";
 
   return (
-    <Text c={color}>
+    <Text c={color} {...rest}>
       {prefix}
-      {change} ({changePercent}%)
+      {change} ({changeDecimal.toDecimalPlaces(2).toString()}%)
     </Text>
   );
 }

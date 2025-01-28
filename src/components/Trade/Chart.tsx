@@ -48,7 +48,7 @@ function Chart({ coinId }: ChartProps) {
     { coinId, daysAgo: +timespan },
     {
       skip: !coinId || timespan === Timespan.LIVE,
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -92,6 +92,8 @@ function Chart({ coinId }: ChartProps) {
     };
   }, [historicalData, timespan]);
 
+  const domain = ["auto", "auto"];
+
   return (
     <div>
       <LineChart
@@ -102,17 +104,19 @@ function Chart({ coinId }: ChartProps) {
         h="300"
         withDots={false}
         // xAxisProps={} TODO: In live, can we set domain so points fill in from left to right?
-        yAxisProps={
-          chartData.low && chartData.high
-            ? {
-                domain: [chartData.low.toNumber(), chartData.high.toNumber()],
-              }
-            : undefined
-        }
+        yAxisProps={{
+          domain:
+            timespan === Timespan.LIVE
+              ? domain
+              : [
+                  chartData.low ? chartData.low.toNumber() : "auto",
+                  chartData.high ? chartData.high.toNumber() : "auto",
+                ],
+        }}
       />
       <SegmentedControl
         data={Object.values(Timespan).map(
-          (timespan) => CHART_CONFIGS[timespan].option,
+          (timespan) => CHART_CONFIGS[timespan].option
         )}
         value={timespan}
         onChange={(value) => {

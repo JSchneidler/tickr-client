@@ -1,14 +1,14 @@
-import { NumberFormatter, Text } from "@mantine/core";
+import { NumberFormatter, Text, TextProps } from "@mantine/core";
 import Decimal from "decimal.js";
 
 interface DollarsProps {
   value?: string;
 }
 
-function Dollars({ value }: DollarsProps) {
+function Dollars({ value, ...rest }: DollarsProps & TextProps) {
   return (
     value && (
-      <Text>
+      <Text display="inline-flex" {...rest}>
         <NumberFormatter
           prefix="$"
           value={new Decimal(value).toDecimalPlaces(2).toString()}

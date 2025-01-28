@@ -29,10 +29,12 @@ function Coin({ coinId }: CoinProps) {
     <Stack>
       <Group justify="center" wrap="nowrap">
         <Image src={coin.imageUrl} h={25} />
-        <Title order={4}>{coin.displayName}</Title>
+        <Title order={4} fw="normal">
+          {coin.displayName}
+        </Title>
       </Group>
       <Title order={5}>
-        <Dollars value={price} />
+        <Dollars value={price} size="xl" fw="bolder" />
         <Gain change={change} changePercent={changePercent} />
       </Title>
     </Stack>
