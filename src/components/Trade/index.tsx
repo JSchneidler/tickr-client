@@ -1,29 +1,16 @@
 import { ReactElement, useState } from "react";
-import {
-  Title,
-  Container,
-  Text,
-  Divider,
-  Stack,
-  Group,
-  Center,
-} from "@mantine/core";
-import Decimal from "decimal.js";
+import { Title, Container, Text, Divider, Stack, Group } from "@mantine/core";
 
 import CoinSelector from "../CoinSelector";
-import {
-  useGetCoinQuery,
-  useGetMyHoldingsQuery,
-  useMeQuery,
-} from "../../store/api";
+import { useGetCoinQuery, useMeQuery } from "../../store/api";
 import Orders from "./Orders";
 import TradeForm from "./TradeForm";
 import Chart from "./Chart";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
 import { useLivePrice } from "../../hooks/useLivePrice";
-import { selectHoldingForCoin } from "../../store/selectors";
 import { skipToken } from "@reduxjs/toolkit/query";
+import Holding from "./Holding";
 
 interface InfoProps {
   label: string;
@@ -34,7 +21,7 @@ function Info({ label, element }: InfoProps) {
   return (
     <Group justify="space-between">
       <Text>{label}</Text>
-      <Text fw="bold">{element}</Text>
+      {element}
     </Group>
   );
 }
@@ -45,12 +32,6 @@ function Trade() {
   const { data: user } = useMeQuery();
   const { data: coin } = useGetCoinQuery(coinId ?? skipToken);
   const { price, change, changePercent } = useLivePrice(coinId);
-
-  const { holding } = useGetMyHoldingsQuery(undefined, {
-    selectFromResult: (result) => ({
-      holding: selectHoldingForCoin(result, coinId),
-    }),
-  });
 
   return (
     <div>
@@ -86,25 +67,8 @@ function Trade() {
               <Stack>
                 <TradeForm coinId={coinId} />
                 <Divider m={10} />
-                <Center>
-                  <Title order={3}>
-                    {!holding && "No owned shares"}
-                    {holding && (
-                      <>
-                        {holding.shares} shares (
-                        <Dollars
-                          value={new Decimal(holding.shares)
-                            .mul(coin.currentPrice)
-                            .toDecimalPlaces(2)
-                            .toString()}
-                        />
-                        ) at cost average of <Dollars value={holding.cost} />
-                      </>
-                    )}
-                  </Title>
-                </Center>
+                <Holding coinId={coinId} />
                 <Divider m={10} />
-                <Title order={4}>Active Orders</Title>
                 <Orders coinId={coinId} />
               </Stack>
             )}

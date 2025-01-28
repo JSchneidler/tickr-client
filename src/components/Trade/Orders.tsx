@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { TbTrash } from "react-icons/tb";
-import { ActionIcon, Table } from "@mantine/core";
+import { ActionIcon, Center, Table, Title } from "@mantine/core";
 
 import { useDeleteOrderMutation, useGetMyOrdersQuery } from "../../store/api";
 
@@ -18,7 +18,12 @@ function Orders({ coinId }: OrdersProps) {
     });
   }, [coinId, allOrders]);
 
-  if (orders.length === 0) return;
+  if (orders.length === 0)
+    return (
+      <Center>
+        <Title order={3}>No active orders</Title>
+      </Center>
+    );
 
   const rows = orders.map((order) => (
     <Table.Tr key={order.id}>
@@ -41,17 +46,20 @@ function Orders({ coinId }: OrdersProps) {
   ));
 
   return (
-    <Table>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Direction</Table.Th>
-          <Table.Th>Type</Table.Th>
-          <Table.Th>Price</Table.Th>
-          <Table.Th>Shares</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
-    </Table>
+    <div>
+      <Title order={4}>Active Orders</Title>
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Direction</Table.Th>
+            <Table.Th>Type</Table.Th>
+            <Table.Th>Price</Table.Th>
+            <Table.Th>Shares</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
+    </div>
   );
 }
 

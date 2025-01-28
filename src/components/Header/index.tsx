@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   Group,
   Button,
   Modal,
@@ -9,9 +8,11 @@ import {
   ActionIcon,
   useMantineColorScheme,
   useComputedColorScheme,
+  Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { TbSunHigh, TbMoon } from "react-icons/tb";
+import { ReactSVG } from "react-svg";
 
 import TickrLogo from "../../assets/tickr-logo.svg";
 import {
@@ -23,6 +24,8 @@ import {
 import { usePortfolioValue } from "../../hooks/usePortfolioValue";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
+
+import "./Header.css";
 
 interface AuthFields {
   email: string;
@@ -123,20 +126,21 @@ function Header() {
           </Group>
         </form>
       </Modal>
-      <Group justify="space-between" align="center" h="100%" px={5}>
-        <Image src={TickrLogo} w={50} id="logo" />
+      <Group justify="space-between" align="center" h="100%" p={5}>
+        <ReactSVG src={TickrLogo} id="logo" className={computedColorScheme} />
         <Group>
           {user && (
-            <div>
-              {user.name}: <Dollars value={user.balance} />|
+            <>
+              <Text>{user.name}: </Text>
+              <Dollars value={user.balance} />
               {portfolioValue && (
-                <div>
+                <>
                   <Dollars value={portfolioValue.value} />
                   <Gain
                     change={portfolioValue.change}
                     changePercent={portfolioValue.changePercent}
                   />
-                </div>
+                </>
               )}
               <Button
                 onClick={() => {
@@ -145,15 +149,15 @@ function Header() {
               >
                 Logout
               </Button>
-            </div>
+            </>
           )}
           {!user && (
-            <>
+            <div>
               <Button onClick={onRegisterClick}>Register</Button>
               <Button onClick={onLoginClick} ml={5}>
                 Login
               </Button>
-            </>
+            </div>
           )}
           <ActionIcon
             onClick={() => {
