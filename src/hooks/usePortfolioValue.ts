@@ -22,7 +22,7 @@ export function usePortfolioValue() {
 
     let value = new Decimal(user.balance);
     for (const holding of holdings) {
-      let price = "";
+      let price = "0";
       if (livePrices[holding.coinId])
         price = livePrices[holding.coinId]!.price; // eslint-disable-line @typescript-eslint/no-non-null-assertion
       else {

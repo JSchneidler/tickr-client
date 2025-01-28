@@ -32,6 +32,7 @@ interface OrdersProps {
 }
 
 function TradeForm({ coinId }: OrdersProps) {
+  const [quantity, setQuantity] = useState<Decimal>();
   const [quantityType, setQuantityType] = useState(QuantityType.SHARES);
   const [orderType, setOrderType] = useState(OrderType.MARKET);
   const [cost, setCost] = useState<Decimal>();
@@ -45,31 +46,46 @@ function TradeForm({ coinId }: OrdersProps) {
   });
   const [createOrder] = useCreateOrderMutation();
 
-  const quantity = useField<string | undefined>({
+  const quantityField = useField<string | undefined>({
     initialValue: undefined,
   });
 
-  useEffect(calculateCost, [coin, quantity, quantityType]);
+  useEffect(() => {
+    if (!coin || !quantity) setCost(undefined);
+    else {
+      if (quantityType === QuantityType.SHARES)
+        setCost(new Decimal(quantity).mul(coin.currentPrice));
+      else setCost(new Decimal(quantity).div(coin.currentPrice));
+    }
+  }, [coin, quantity, quantityType]);
 
   const [buyDisabled, sellDisabled] = useMemo(() => {
-    if (!cost || !user) return [true, true];
+    if (!cost || !user || !quantity) return [true, true];
 
-    const qty = new Decimal(quantity.getValue() ?? 0);
     const cst = new Decimal(cost);
 
-    if (qty.eq(0)) return [true, true];
+    if (quantity.eq(0)) return [true, true];
 
     if (quantityType === QuantityType.SHARES)
       return [
-        qty.eq(0) || cst.gt(user.balance),
-        !holding || qty.gt(holding.shares),
+        quantity.eq(0) || cst.gt(user.balance),
+        !holding || quantity.gt(holding.shares),
       ];
     else
       return [
-        qty.eq(0) || qty.gt(user.balance),
+        quantity.eq(0) || quantity.gt(user.balance),
         !holding || cst.gt(holding.shares),
       ];
-  }, [cost, holding, user, quantity, quantityType]);
+  }, [cost, holding, user, quantityType, quantity]);
+
+  function onValueChange(value: string) {
+    try {
+      const decimal = new Decimal(value);
+      setQuantity(decimal);
+    } catch {
+      setQuantity(undefined);
+    }
+  }
 
   function buy() {
     if (coinId)
@@ -77,10 +93,12 @@ function TradeForm({ coinId }: OrdersProps) {
         coinId,
         shares:
           quantityType === QuantityType.SHARES
-            ? quantity.getValue()
+            ? quantityField.getValue()
             : undefined,
         price:
-          quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
+          quantityType === QuantityType.MONEY
+            ? quantityField.getValue()
+            : undefined,
         type: OrderType.MARKET,
         direction: OrderDirection.BUY,
       });
@@ -92,24 +110,15 @@ function TradeForm({ coinId }: OrdersProps) {
         coinId,
         shares:
           quantityType === QuantityType.SHARES
-            ? quantity.getValue()
+            ? quantityField.getValue()
             : undefined,
         price:
-          quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
+          quantityType === QuantityType.MONEY
+            ? quantityField.getValue()
+            : undefined,
         type: OrderType.MARKET,
         direction: OrderDirection.SELL,
       });
-  }
-
-  function calculateCost() {
-    if (!coin || !quantity.getValue() || quantity.getValue() === "0")
-      setCost(undefined);
-    else {
-      const value = new Decimal(quantity.getValue()!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      if (quantityType === QuantityType.SHARES)
-        setCost(new Decimal(value).mul(coin.currentPrice));
-      else setCost(new Decimal(value).div(coin.currentPrice));
-    }
   }
 
   function swapQuantityType() {
@@ -121,7 +130,7 @@ function TradeForm({ coinId }: OrdersProps) {
   function sellAllShares() {
     if (holding) {
       setQuantityType(QuantityType.SHARES);
-      quantity.setValue(holding.shares);
+      quantityField.setValue(holding.shares);
     }
   }
 
@@ -156,10 +165,10 @@ function TradeForm({ coinId }: OrdersProps) {
         leftSection={quantitySwapButton}
         rightSection={allSharesButton}
         allowNegative={false}
-        onValueChange={() => {
-          calculateCost();
+        onValueChange={(values) => {
+          onValueChange(values.formattedValue);
         }}
-        {...quantity.getInputProps()}
+        {...quantityField.getInputProps()}
       />
       {orderType === OrderType.LIMIT && (
         <NumberInput placeholder="Limit" allowNegative={false} />
