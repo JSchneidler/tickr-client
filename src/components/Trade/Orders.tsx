@@ -14,11 +14,11 @@ function Orders({ coinId }: OrdersProps) {
 
   const orders = useMemo(() => {
     return allOrders.filter((order) => {
-      return order.coinId === coinId && order.filled === false;
+      return order.coinId === coinId && !order.filled;
     });
   }, [coinId, allOrders]);
 
-  if (orders?.length === 0) return;
+  if (orders.length === 0) return;
 
   const rows = orders.map((order) => (
     <Table.Tr key={order.id}>
@@ -28,7 +28,9 @@ function Orders({ coinId }: OrdersProps) {
       <Table.Td>{order.shares}</Table.Td>
       <Table.Td>
         <ActionIcon
-          onClick={() => deleteOrder(order.id)}
+          onClick={() => {
+            void deleteOrder(order.id);
+          }}
           c="red"
           variant="subtle"
         >

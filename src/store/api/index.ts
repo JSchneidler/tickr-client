@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-invalid-void-type: 0 */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import {
@@ -7,10 +8,11 @@ import {
   CoinWithQuote,
   Holding,
   Order,
-  OrderRequest,
+  CreateOrder,
   CoinHistoricalData,
   CoinHistoricalDataRequest,
 } from "./schema";
+import moment from "moment";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -62,13 +64,14 @@ export const api = createApi({
       providesTags: ["Coin"],
     }),
     getCoin: builder.query<CoinWithQuote, number>({
-      query: (coinId) => `/coins/${coinId}`,
+      query: (coinId) => `/coins/${coinId.toString()}`,
     }),
     getCoinHistoricalData: builder.query<
       CoinHistoricalData,
       CoinHistoricalDataRequest
     >({
-      query: ({ coinId, daysAgo }) => `/coins/${coinId}/historical/${daysAgo}`,
+      query: ({ coinId, daysAgo }) =>
+        `/coins/${coinId.toString()}/historical/${daysAgo.toString()}`,
     }),
 
     // Holdings
@@ -82,27 +85,35 @@ export const api = createApi({
       query: () => "/me/orders",
       providesTags: ["Order"],
     }),
-    createOrder: builder.mutation<Order, OrderRequest>({
+    createOrder: builder.mutation<Order, CreateOrder>({
       query: (orderRequest) => ({
         url: "/orders",
         method: "POST",
         body: orderRequest,
       }),
-      async onQueryStarted(order, { dispatch }) {
+      onQueryStarted(order, { dispatch }) {
         dispatch(
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
-            draft.push({ ...order, id: 0, filled: false });
+            const now = moment().unix().toString();
+            draft.push({
+              ...order,
+              id: 0,
+              userId: 0,
+              filled: false,
+              createdAt: now,
+              updatedAt: now,
+            });
           }),
         );
       },
     }),
     deleteOrder: builder.mutation<void, number>({
       query: (orderId) => ({
-        url: `/orders/${orderId}`,
+        url: `/orders/${orderId.toString()}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Order"],
-      async onQueryStarted(orderId, { dispatch }) {
+      onQueryStarted(orderId, { dispatch }) {
         dispatch(
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             Object.assign(

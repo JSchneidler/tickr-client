@@ -11,20 +11,24 @@ import { selectEntities } from "../store/livePrices";
 
 export function usePortfolioValue() {
   const { data: user } = useMeQuery();
-  const { data: coins } = useGetCoinsQuery(undefined, { skip: !user });
-  const { data: holdings } = useGetMyHoldingsQuery(undefined, {
+  const { data: coins = [] } = useGetCoinsQuery(undefined, { skip: !user });
+  const { data: holdings = [] } = useGetMyHoldingsQuery(undefined, {
     skip: !user,
   });
   const livePrices = useAppSelector(selectEntities);
 
   return useMemo(() => {
-    if (!user || (!coins && !livePrices)) return;
+    if (!user) return;
 
     let value = new Decimal(user.balance);
     for (const holding of holdings) {
-      const price = livePrices[holding.coinId]?.price
-        ? livePrices[holding.coinId].price
-        : coins?.find((coin) => coin.id === holding.coinId).currentPrice;
+      let price = "";
+      if (livePrices[holding.coinId])
+        price = livePrices[holding.coinId]!.price; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      else {
+        const coin = coins.find((coin) => coin.id === holding.coinId);
+        if (coin) price = coin.currentPrice;
+      }
       const holdingValue = new Decimal(holding.shares).mul(price);
 
       value = value.add(holdingValue);
@@ -39,20 +43,4 @@ export function usePortfolioValue() {
       changePercent: changePercent.toString(),
     };
   }, [user, coins, holdings, livePrices]);
-
-  // const [change, changePercent] = useMemo(() => {
-  //   if (!coin || !price) return [0, 0];
-
-  //   const change = new Decimal(price).sub(coin.dayLow).toDecimalPlaces(2); // TODO: Add 24h ago field
-  //   return [
-  //     change.toString(),
-  //     change.div(coin.dayLow).mul(100).toDecimalPlaces(2).toString(),
-  //   ];
-  // }, [coin, price]);
-
-  // return {
-  //   price,
-  //   change,
-  //   changePercent,
-  // };
 }

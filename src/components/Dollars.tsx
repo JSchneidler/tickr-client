@@ -2,16 +2,18 @@ import { NumberFormatter } from "@mantine/core";
 import Decimal from "decimal.js";
 
 interface DollarsProps {
-  value: string;
+  value?: string;
 }
 
 function Dollars({ value }: DollarsProps) {
   return (
-    <NumberFormatter
-      prefix="$"
-      value={new Decimal(value).toDecimalPlaces(2).toString()}
-      thousandSeparator
-    />
+    value && (
+      <NumberFormatter
+        prefix="$"
+        value={new Decimal(value).toDecimalPlaces(2).toString()}
+        thousandSeparator
+      />
+    )
   );
 }
 

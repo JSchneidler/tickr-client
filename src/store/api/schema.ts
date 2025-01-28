@@ -72,18 +72,14 @@ export enum OrderType {
   TRAILING_STOP = "TRAILING_STOP",
 }
 
-export interface OrderRequest {
-  coinId: number;
-  shares?: string;
-  price?: string;
-  direction: OrderDirection;
-  type: OrderType;
-}
-
-export interface Order extends OrderRequest {
+export interface Order {
   id: number;
   userId: number;
   coinId: number;
+  direction: OrderDirection;
+  type: OrderType;
+  shares?: string;
+  price?: string;
   filled: boolean;
   sharePrice?: string;
   totalPrice?: string;
@@ -92,7 +88,9 @@ export interface Order extends OrderRequest {
   deletedAt?: string;
 }
 
-export interface LivePrice {
-  coinId: number;
-  price: string | null;
-}
+export type CreateOrder = Pick<
+  Order,
+  "coinId" | "direction" | "type" | "shares" | "price"
+>;
+
+export type UpdateOrder = Omit<CreateOrder, "coinId">;

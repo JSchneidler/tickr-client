@@ -1,63 +1,65 @@
+import { Order } from "./store/api/schema";
+
 export enum WebSocketMessageType {
-  ORDER_FILLED = "ORDER_FILLED",
-  WATCH = "WATCH",
-}
-
-type Payload = PriceUpdate | OrderFilled;
-
-export interface WebSocketMessage {
-  type: WebSocketMessageType;
-  payload: Payload;
-}
-
-export interface OrderFilled {
-  id: number;
-}
-
-export interface OrderFilledMessage extends WebSocketMessage {
-  type: WebSocketMessageType.ORDER_FILLED;
-  payload: OrderFilled;
+  ORDER_FILLED,
+  WATCH,
 }
 
 export interface PriceUpdate {
   coinId: number;
-  high: string;
-  low: string;
+  price: string;
 }
 
-export interface WatchMessage extends WebSocketMessage {
-  type: WebSocketMessageType.WATCH;
-  payload: PriceUpdate;
+interface PayloadMap {
+  [WebSocketMessageType.ORDER_FILLED]: Order;
+  [WebSocketMessageType.WATCH]: PriceUpdate[];
 }
 
-type MessageListener = (payload: Payload) => void;
+export interface WebSocketMessage<T extends WebSocketMessageType> {
+  type: T;
+  payload: PayloadMap[T];
+}
+
+type MessageListener<T extends WebSocketMessageType> = (
+  payload: PayloadMap[T],
+) => void;
 
 export class WebSocketClient {
-  private socket: WebSocket = new WebSocket("ws://localhost:3000/api/ws");
+  private _socket: WebSocket = new WebSocket("ws://localhost:3000/api/ws");
+
+  public get socket() {
+    return this._socket;
+  }
 
   connect() {
-    if (!this.socket.CLOSED) return;
+    if (this._socket.readyState !== WebSocket.CLOSED) return;
 
-    this.socket = new WebSocket("ws://localhost:3000/api/ws");
-    this.socket.onopen = () => {
+    this._socket = new WebSocket("ws://localhost:3000/api/ws");
+    this._socket.onopen = () => {
       console.log("Connected to WebSocket");
     };
   }
 
   disconnect() {
-    this.socket.close();
+    this._socket.close();
   }
 
-  listen(type: WebSocketMessageType, listener: MessageListener) {
-    if (!this.socket.OPEN) throw Error("Not connected to WebSocket");
+  listen<T extends WebSocketMessageType>(
+    type: T,
+    listener: MessageListener<T>,
+  ) {
+    if (this._socket.readyState !== WebSocket.OPEN)
+      throw Error("Not connected to WebSocket");
 
-    const internalListener = (event: MessageEvent) => {
-      const message = JSON.parse(event.data) as WebSocketMessage;
+    const internalListener = (event: MessageEvent<string>) => {
+      const message = JSON.parse(event.data) as WebSocketMessage<T>;
 
       if (message.type === type) listener(message.payload);
     };
 
-    this.socket.addEventListener("message", internalListener);
-    return () => this.socket.removeEventListener("message", internalListener);
+    this._socket.addEventListener("message", internalListener);
+    return () => {
+      this._socket.removeEventListener("message", internalListener);
+    };
   }
 }

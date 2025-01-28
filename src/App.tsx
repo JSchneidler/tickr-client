@@ -34,8 +34,8 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      fetchHoldings();
-      fetchOrders();
+      void fetchHoldings();
+      void fetchOrders();
     }
   }, [user, fetchHoldings, fetchOrders]);
 

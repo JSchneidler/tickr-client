@@ -8,12 +8,13 @@ import { Holding } from "./api/schema";
 
 type GetHoldingSelectFromResultArg = TypedUseQueryStateResult<
   Holding[],
-  undefined,
+  unknown,
   BaseQueryFn
 >;
 
 export const selectHoldingForCoin = createSelector(
   (res: GetHoldingSelectFromResultArg) => res.data,
   (_: GetHoldingSelectFromResultArg, coinId?: number) => coinId,
-  (holdings, coinId) => holdings?.find((holding) => holding.coinId === coinId),
+  (holdings = [], coinId) =>
+    coinId ? holdings.find((holding) => holding.coinId === coinId) : undefined,
 );

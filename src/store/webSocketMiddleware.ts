@@ -1,44 +1,44 @@
 import { Middleware, isAnyOf } from "@reduxjs/toolkit";
 import { notifications } from "@mantine/notifications";
 
+import { RootState } from ".";
 import { WebSocketClient, WebSocketMessageType } from "../webSocketClient";
-import { LivePrice, Order } from "./api/schema";
 import { api } from "./api";
 import { pricesUpdated } from "./livePrices";
-import { RootState } from ".";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export const webSocketMiddleware: Middleware<{}, RootState> = (store) => {
   const webSocketClient = new WebSocketClient();
 
-  function attachListeners() {
-    webSocketClient.listen(
-      WebSocketMessageType.WATCH,
-      (prices: LivePrice[]) => {
-        store.dispatch(pricesUpdated(prices));
-      },
-    );
+  webSocketClient.socket.addEventListener("open", () => {
+    attachListeners();
+  });
 
-    webSocketClient.listen(
-      WebSocketMessageType.ORDER_FILLED,
-      (order: Order) => {
-        const { data: coin } = api.endpoints.getCoin.select(order.coinId)(
-          store.getState(),
-        );
-        const quantity = order.shares
-          ? `${order.shares} shares`
-          : `$${order.price}`;
+  function attachListeners() {
+    webSocketClient.listen(WebSocketMessageType.WATCH, (prices) => {
+      store.dispatch(pricesUpdated(prices));
+    });
+
+    webSocketClient.listen(WebSocketMessageType.ORDER_FILLED, (order) => {
+      const { data: coin } = api.endpoints.getCoin.select(order.coinId)(
+        // TODO: What if coin is not cached?
+        store.getState(),
+      );
+
+      // Shares or price must exist
+      const quantity = order.shares
+        ? `${order.shares} shares`
+        : `$${order.price!}`; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+
+      if (coin && order.sharePrice)
         notifications.show({
           title: "Order filled",
-          message: `${order.direction}@${order.type} ${quantity} of ${coin.name}`,
+          message: `${order.direction}@${order.sharePrice} ${quantity} of ${coin.name}`,
         });
 
-        store.dispatch(api.util.invalidateTags(["User", "Holding", "Order"]));
-      },
-    );
+      store.dispatch(api.util.invalidateTags(["User", "Holding", "Order"]));
+    });
   }
-
-  attachListeners();
 
   return (next) => (action) => {
     if (

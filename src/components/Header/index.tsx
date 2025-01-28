@@ -24,6 +24,12 @@ import { usePortfolioValue } from "../../hooks/usePortfolioValue";
 import Dollars from "../Dollars";
 import Gain from "../Gain";
 
+interface AuthFields {
+  email: string;
+  name?: string;
+  password: string;
+}
+
 function Header() {
   const { data: user } = useMeQuery();
   const [register] = useRegisterMutation();
@@ -40,16 +46,15 @@ function Header() {
     getInitialValueInEffect: true,
   });
 
-  const initialValues = {
-    email: "",
-    password: "",
-  };
-  if (isRegistration) initialValues.name = "";
-  const form = useForm({
+  const form = useForm<AuthFields>({
     mode: "uncontrolled",
-    initialValues,
+    initialValues: {
+      email: "",
+      name: undefined,
+      password: "",
+    },
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      email: (value) => (/^\S+@\S+$/.test(value) ? undefined : "Invalid email"),
     },
   });
 
@@ -76,13 +81,17 @@ function Header() {
         opened={opened}
         title={isRegistration ? "Register" : "Login"}
         centered
-        onClose={() => setOpened(false)}
+        onClose={() => {
+          setOpened(false);
+        }}
       >
         <form
           onSubmit={form.onSubmit((values) => {
             // TODO: Move to function, don't close unless success
-            if (isRegistration) register({ ...values });
-            else login({ ...values });
+            // @ts-expect-error: values.name is being checked
+            if (isRegistration && values.name) void register({ ...values });
+            else if (!isRegistration) void login({ ...values });
+
             setOpened(false);
             form.reset();
           })}
@@ -129,7 +138,13 @@ function Header() {
                   />
                 </div>
               )}
-              <Button onClick={() => logout()}>Logout</Button>
+              <Button
+                onClick={() => {
+                  void logout();
+                }}
+              >
+                Logout
+              </Button>
             </div>
           )}
           {!user && (
@@ -141,9 +156,9 @@ function Header() {
             </>
           )}
           <ActionIcon
-            onClick={() =>
-              setColorScheme(computedColorScheme === "dark" ? "light" : "dark")
-            }
+            onClick={() => {
+              setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
+            }}
           >
             {computedColorScheme === "dark" && <TbSunHigh />}
             {computedColorScheme === "light" && <TbMoon />}

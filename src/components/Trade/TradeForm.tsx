@@ -20,6 +20,7 @@ import {
 import { OrderDirection, OrderType } from "../../store/api/schema";
 import Dollars from "../Dollars";
 import { selectHoldingForCoin } from "../../store/selectors";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 enum QuantityType {
   SHARES,
@@ -36,7 +37,7 @@ function TradeForm({ coinId }: OrdersProps) {
   const [cost, setCost] = useState<Decimal>();
 
   const { data: user } = useMeQuery();
-  const { data: coin } = useGetCoinQuery(coinId, { skip: !coinId });
+  const { data: coin } = useGetCoinQuery(coinId ?? skipToken);
   const { holding } = useGetMyHoldingsQuery(undefined, {
     selectFromResult: (result) => ({
       holding: selectHoldingForCoin(result, coinId),
@@ -50,40 +51,64 @@ function TradeForm({ coinId }: OrdersProps) {
 
   useEffect(calculateCost, [coin, quantity, quantityType]);
 
+  const [buyDisabled, sellDisabled] = useMemo(() => {
+    if (!cost || !user) return [true, true];
+
+    const qty = new Decimal(quantity.getValue() ?? 0);
+    const cst = new Decimal(cost);
+
+    if (qty.eq(0)) return [true, true];
+
+    if (quantityType === QuantityType.SHARES)
+      return [
+        qty.eq(0) || cst.gt(user.balance),
+        !holding || qty.gt(holding.shares),
+      ];
+    else
+      return [
+        qty.eq(0) || qty.gt(user.balance),
+        !holding || cst.gt(holding.shares),
+      ];
+  }, [cost, holding, user, quantity, quantityType]);
+
   function buy() {
-    createOrder({
-      coinId,
-      shares:
-        quantityType === QuantityType.SHARES ? quantity.getValue() : undefined,
-      price:
-        quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
-      type: OrderType.MARKET,
-      direction: OrderDirection.BUY,
-    });
+    if (coinId)
+      void createOrder({
+        coinId,
+        shares:
+          quantityType === QuantityType.SHARES
+            ? quantity.getValue()
+            : undefined,
+        price:
+          quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
+        type: OrderType.MARKET,
+        direction: OrderDirection.BUY,
+      });
   }
 
   function sell() {
-    createOrder({
-      coinId,
-      shares:
-        quantityType === QuantityType.SHARES ? quantity.getValue() : undefined,
-      price:
-        quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
-      type: OrderType.MARKET,
-      direction: OrderDirection.SELL,
-    });
+    if (coinId)
+      void createOrder({
+        coinId,
+        shares:
+          quantityType === QuantityType.SHARES
+            ? quantity.getValue()
+            : undefined,
+        price:
+          quantityType === QuantityType.MONEY ? quantity.getValue() : undefined,
+        type: OrderType.MARKET,
+        direction: OrderDirection.SELL,
+      });
   }
 
   function calculateCost() {
-    try {
-      const value = new Decimal(quantity.getValue());
-      if (value) {
-        if (quantityType === QuantityType.SHARES)
-          setCost(new Decimal(value).mul(coin?.currentPrice));
-        else setCost(new Decimal(value).div(coin?.currentPrice));
-      }
-    } catch {
+    if (!coin || !quantity.getValue() || quantity.getValue() === "0")
       setCost(undefined);
+    else {
+      const value = new Decimal(quantity.getValue()!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      if (quantityType === QuantityType.SHARES)
+        setCost(new Decimal(value).mul(coin.currentPrice));
+      else setCost(new Decimal(value).div(coin.currentPrice));
     }
   }
 
@@ -94,8 +119,10 @@ function TradeForm({ coinId }: OrdersProps) {
   }
 
   function sellAllShares() {
-    setQuantityType(QuantityType.SHARES);
-    quantity.setValue(holding.shares);
+    if (holding) {
+      setQuantityType(QuantityType.SHARES);
+      quantity.setValue(holding.shares);
+    }
   }
 
   const quantitySwapButton = (
@@ -110,40 +137,17 @@ function TradeForm({ coinId }: OrdersProps) {
     </ActionIcon>
   );
 
-  const [buyDisabled, sellDisabled] = useMemo(() => {
-    if (!quantity.getValue() || quantity.getValue() === "0" || !cost || !user)
-      return [true, true];
-
-    const qty = new Decimal(quantity.getValue());
-    const cst = new Decimal(cost);
-
-    if (qty.eq(0)) return [true, true];
-
-    if (quantityType === QuantityType.SHARES)
-      return [
-        qty.eq(0) || cst.gt(user?.balance),
-        !holding || qty.gt(holding.shares),
-      ];
-    else if (quantityType === QuantityType.MONEY)
-      return [
-        qty.eq(0) || qty.gt(user?.balance),
-        !holding || cst.gt(holding.shares),
-      ];
-
-    return [true, true];
-  }, [cost, holding, user, quantity, quantityType]);
-
   return (
     <>
       <SegmentedControl
         data={[
           { value: OrderType.MARKET, label: "Market" },
           { value: OrderType.LIMIT, label: "Limit" },
-          { value: OrderType.STOP, label: "Stop" },
-          { value: OrderType.TRAILING_STOP, label: "Trailing Stop" },
         ]}
         value={orderType}
-        onChange={setOrderType}
+        onChange={(value) => {
+          setOrderType(value as OrderType);
+        }}
       />
       <NumberInput
         placeholder={
@@ -152,7 +156,9 @@ function TradeForm({ coinId }: OrdersProps) {
         leftSection={quantitySwapButton}
         rightSection={allSharesButton}
         allowNegative={false}
-        onValueChange={({ value }) => calculateCost(value)}
+        onValueChange={() => {
+          calculateCost();
+        }}
         {...quantity.getInputProps()}
       />
       {orderType === OrderType.LIMIT && (
@@ -162,7 +168,9 @@ function TradeForm({ coinId }: OrdersProps) {
         <Button.Group w="100%">
           <Button
             disabled={buyDisabled}
-            onClick={() => buy()}
+            onClick={() => {
+              buy();
+            }}
             color="green"
             fullWidth
           >
@@ -170,7 +178,9 @@ function TradeForm({ coinId }: OrdersProps) {
           </Button>
           <Button
             disabled={sellDisabled}
-            onClick={() => sell()}
+            onClick={() => {
+              sell();
+            }}
             color="red"
             fullWidth
           >
@@ -180,10 +190,10 @@ function TradeForm({ coinId }: OrdersProps) {
         {cost && (
           <Center w="100%">
             {quantityType === QuantityType.SHARES && (
-              <Dollars value={cost?.toString()} />
+              <Dollars value={cost.toString()} />
             )}
             {quantityType === QuantityType.MONEY && (
-              <Text>{cost?.toString()} shares</Text>
+              <Text>{cost.toString()} shares</Text>
             )}
           </Center>
         )}

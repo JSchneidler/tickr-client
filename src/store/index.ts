@@ -28,7 +28,8 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 export type AppDispatch = AppStore["dispatch"];
 
-export const createAppAsyncThunk = createAsyncThunk.withTypes<{
-  state: RootState;
-  dispatch: AppDispatch;
-}>;
+export const createAppAsyncThunk = () =>
+  createAsyncThunk.withTypes<{
+    state: RootState;
+    dispatch: AppDispatch;
+  }>();

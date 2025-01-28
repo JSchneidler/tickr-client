@@ -3,18 +3,19 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
+
 import { RootState } from ".";
-import { LivePrice } from "./api/schema";
+import { PriceUpdate } from "../webSocketClient";
 
 const pricesAdapter = createEntityAdapter({
-  selectId: (livePrice: LivePrice) => livePrice.coinId,
+  selectId: (livePrice: PriceUpdate) => livePrice.coinId,
 });
 
 const livePricesSlice = createSlice({
   name: "livePrices",
   initialState: pricesAdapter.getInitialState(),
   reducers: {
-    pricesUpdated(state, action: PayloadAction<LivePrice[]>) {
+    pricesUpdated(state, action: PayloadAction<PriceUpdate[]>) {
       pricesAdapter.setAll(state, action.payload);
     },
   },

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import {
   Title,
-  // Loader,
   Container,
   Text,
   Divider,
@@ -24,10 +23,11 @@ import Dollars from "../Dollars";
 import Gain from "../Gain";
 import { useLivePrice } from "../../hooks/useLivePrice";
 import { selectHoldingForCoin } from "../../store/selectors";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 interface InfoProps {
   label: string;
-  element: JSX.Element;
+  element: ReactElement;
 }
 
 function Info({ label, element }: InfoProps) {
@@ -43,7 +43,7 @@ function Trade() {
   const [coinId, setCoinId] = useState<number>();
 
   const { data: user } = useMeQuery();
-  const { data: coin } = useGetCoinQuery(coinId, { skip: !coinId });
+  const { data: coin } = useGetCoinQuery(coinId ?? skipToken);
   const { price, change, changePercent } = useLivePrice(coinId);
 
   const { holding } = useGetMyHoldingsQuery(undefined, {
@@ -54,7 +54,11 @@ function Trade() {
 
   return (
     <div>
-      <CoinSelector onCoinSelect={(id) => setCoinId(+id)} />
+      <CoinSelector
+        onCoinSelect={(id) => {
+          setCoinId(+id);
+        }}
+      />
       {coin && (
         <Container size="xl" pt={50}>
           <Title order={2}>

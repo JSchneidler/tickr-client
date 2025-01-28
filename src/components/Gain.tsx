@@ -2,11 +2,13 @@ import { Text } from "@mantine/core";
 import Decimal from "decimal.js";
 
 interface GainProps {
-  change: string;
-  changePercent: string;
+  change?: string;
+  changePercent?: string;
 }
 
 function Gain({ change, changePercent }: GainProps) {
+  if (!change || !changePercent) return;
+
   const changeDecimal = new Decimal(changePercent);
   const prefix = changeDecimal.gte(0) ? "+" : undefined;
 

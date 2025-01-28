@@ -11,7 +11,8 @@ import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(
+// @ts-expect-error: #root always exists
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <App />
