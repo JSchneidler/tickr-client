@@ -16,7 +16,7 @@ import moment from "moment";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3000/api",
+    baseUrl: `http://${import.meta.env.BASE_URL}:3000/api`,
     credentials: "include",
   }),
   tagTypes: ["User", "Coin", "Holding", "Order"],
@@ -103,7 +103,7 @@ export const api = createApi({
               createdAt: now,
               updatedAt: now,
             });
-          }),
+          })
         );
       },
     }),
@@ -118,9 +118,9 @@ export const api = createApi({
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             Object.assign(
               draft,
-              draft.filter((order) => order.id !== orderId),
+              draft.filter((order) => order.id !== orderId)
             );
-          }),
+          })
         );
       },
     }),
