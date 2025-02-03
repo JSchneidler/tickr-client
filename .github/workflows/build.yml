@@ -48,7 +48,7 @@ jobs:
           username: root
           key: ${{ secrets.PRIVATE_KEY }}
           source: "dist/"
-          target: "~/tickr-client/dist/"
+          target: "~/tickr-client/"
 
       - name: SSH
         uses: appleboy/ssh-action@master
