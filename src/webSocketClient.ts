@@ -24,8 +24,10 @@ type MessageListener<T extends WebSocketMessageType> = (
   payload: PayloadMap[T],
 ) => void;
 
+const BASE_URL = `${window.location.hostname}:3000`;
+
 export class WebSocketClient {
-  private _socket: WebSocket = new WebSocket("ws://localhost:3000/api/ws");
+  private _socket: WebSocket = new WebSocket(`ws://${BASE_URL}/api/ws`);
 
   public get socket() {
     return this._socket;
@@ -34,7 +36,7 @@ export class WebSocketClient {
   connect() {
     if (this._socket.readyState !== WebSocket.CLOSED) return;
 
-    this._socket = new WebSocket("ws://localhost:3000/api/ws");
+    this._socket = new WebSocket(`ws://${BASE_URL}/api/ws`);
     this._socket.onopen = () => {
       console.log("Connected to WebSocket");
     };

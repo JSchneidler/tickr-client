@@ -16,7 +16,7 @@ import moment from "moment";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: `http://${import.meta.env.BASE_URL}:3000/api`,
+    baseUrl: `http://${window.location.hostname}:3000/api`,
     credentials: "include",
   }),
   tagTypes: ["User", "Coin", "Holding", "Order"],
