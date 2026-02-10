@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "tsc --noEmit -p tsconfig.app.json && eslint . && pnpm format",
+    "lint": "tsc --noEmit -p tsconfig.app.json && eslint . --fix && pnpm format",
     "format": "prettier . --write",
     "preview": "vite preview",
     "prepare": "husky"
@@ -22,8 +22,8 @@
     "dayjs": "^1.11.13",
     "decimal.js": "^10.4.3",
     "js-cookie": "^3.0.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-error-boundary": "^5.0.0",
     "react-icons": "^5.4.0",
     "react-redux": "^9.2.0",
@@ -35,8 +35,8 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/js-cookie": "^3.0.6",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.2",
