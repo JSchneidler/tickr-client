@@ -1,5 +1,6 @@
 /* eslint @typescript-eslint/no-invalid-void-type: 0 */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import dayjs from "dayjs";
 
 import {
   User,
@@ -12,7 +13,6 @@ import {
   CoinHistoricalData,
   CoinHistoricalDataRequest,
 } from "./schema";
-import moment from "moment";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -94,7 +94,7 @@ export const api = createApi({
       onQueryStarted(order, { dispatch }) {
         dispatch(
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
-            const now = moment().unix().toString();
+            const now = dayjs().unix().toString();
             draft.push({
               ...order,
               id: 0,
@@ -103,7 +103,7 @@ export const api = createApi({
               createdAt: now,
               updatedAt: now,
             });
-          }),
+          })
         );
       },
     }),
@@ -118,9 +118,9 @@ export const api = createApi({
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             Object.assign(
               draft,
-              draft.filter((order) => order.id !== orderId),
+              draft.filter((order) => order.id !== orderId)
             );
-          }),
+          })
         );
       },
     }),

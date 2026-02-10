@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Group,
   Button,
@@ -61,12 +61,21 @@ function Header() {
     },
   });
 
-  // function onFormSubmit() {
-  //   return form.onSubmit((values) => {
-  //     dispatch(isRegistration ? register({ ...values }) : login({ ...values }));
-  //     setOpened(false);
-  //   });
-  // }
+  const onFormSubmit = useMemo(
+    () =>
+      form.onSubmit((values) => {
+        // dispatch(isRegistration ? register({ ...values }) : login({ ...values }));
+        // setOpened(false);
+
+        // @ts-expect-error: values.name is being checked
+        if (isRegistration && values.name) void register({ ...values });
+        else if (!isRegistration) void login({ ...values });
+
+        setOpened(false);
+        form.reset();
+      }),
+    [form, isRegistration, login, register]
+  );
 
   function onRegisterClick() {
     setIsRegistration(true);
@@ -89,15 +98,16 @@ function Header() {
         }}
       >
         <form
-          onSubmit={form.onSubmit((values) => {
-            // TODO: Move to function, don't close unless success
-            // @ts-expect-error: values.name is being checked
-            if (isRegistration && values.name) void register({ ...values });
-            else if (!isRegistration) void login({ ...values });
+          onSubmit={onFormSubmit}
+          // onSubmit={form.onSubmit((values) => {
+          //   // TODO: Move to function, don't close unless success
+          //   // @ts-expect-error: values.name is being checked
+          //   if (isRegistration && values.name) void register({ ...values });
+          //   else if (!isRegistration) void login({ ...values });
 
-            setOpened(false);
-            form.reset();
-          })}
+          //   setOpened(false);
+          //   form.reset();
+          // })}
         >
           <TextInput
             required

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { SegmentedControl, SegmentedControlItem } from "@mantine/core";
 import { LineChart } from "@mantine/charts";
 import Decimal from "decimal.js";
-import moment from "moment";
+import dayjs from "dayjs";
 
 import { useGetCoinHistoricalDataQuery } from "../../store/api";
 import { useLivePrice } from "../../hooks/useLivePrice";
@@ -48,7 +48,7 @@ function Chart({ coinId }: ChartProps) {
     { coinId, daysAgo: +timespan },
     {
       skip: !coinId || timespan === Timespan.LIVE,
-    },
+    }
   );
 
   useLayoutEffect(() => {
@@ -61,7 +61,7 @@ function Chart({ coinId }: ChartProps) {
       setLivePrices((livePrices) => [
         ...livePrices,
         {
-          date: moment().format(CHART_CONFIGS[timespan].format),
+          date: dayjs().format(CHART_CONFIGS[timespan].format),
           Price: new Decimal(price).toNumber(),
         },
       ]);
@@ -77,7 +77,7 @@ function Chart({ coinId }: ChartProps) {
           if (!low || low.gt(time[1]))
             low = new Decimal(time[1]).toSignificantDigits(8);
 
-          const t = moment(time[0]);
+          const t = dayjs(time[0]);
           return {
             date: t.format(CHART_CONFIGS[timespan].format), // TODO: Does this sort correctly?
             Price: time[1],
@@ -116,7 +116,7 @@ function Chart({ coinId }: ChartProps) {
       />
       <SegmentedControl
         data={Object.values(Timespan).map(
-          (timespan) => CHART_CONFIGS[timespan].option,
+          (timespan) => CHART_CONFIGS[timespan].option
         )}
         value={timespan}
         onChange={(value) => {
