@@ -103,7 +103,7 @@ export const api = createApi({
               createdAt: now,
               updatedAt: now,
             });
-          })
+          }),
         );
       },
     }),
@@ -118,9 +118,9 @@ export const api = createApi({
           api.util.updateQueryData("getMyOrders", undefined, (draft) => {
             Object.assign(
               draft,
-              draft.filter((order) => order.id !== orderId)
+              draft.filter((order) => order.id !== orderId),
             );
-          })
+          }),
         );
       },
     }),

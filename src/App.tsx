@@ -65,7 +65,7 @@ function App() {
     createTheme({
       primaryColor,
       fontFamily: "Verdana, sans-serif",
-    })
+    }),
   );
 
   return (

@@ -74,7 +74,7 @@ function Header() {
         setOpened(false);
         form.reset();
       }),
-    [form, isRegistration, login, register]
+    [form, isRegistration, login, register],
   );
 
   function onRegisterClick() {

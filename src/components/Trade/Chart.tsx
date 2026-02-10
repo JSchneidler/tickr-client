@@ -48,7 +48,7 @@ function Chart({ coinId }: ChartProps) {
     { coinId, daysAgo: +timespan },
     {
       skip: !coinId || timespan === Timespan.LIVE,
-    }
+    },
   );
 
   useLayoutEffect(() => {
@@ -116,7 +116,7 @@ function Chart({ coinId }: ChartProps) {
       />
       <SegmentedControl
         data={Object.values(Timespan).map(
-          (timespan) => CHART_CONFIGS[timespan].option
+          (timespan) => CHART_CONFIGS[timespan].option,
         )}
         value={timespan}
         onChange={(value) => {
