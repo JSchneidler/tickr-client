@@ -23,7 +23,7 @@ function Holding({ coinId }: HoldingProps) {
     coin && (
       <Center>
         <Title order={3}>
-          {!holding && "No owned shares"}
+          {!holding && "No holdings"}
           {holding && (
             <>
               {holding.shares} shares (

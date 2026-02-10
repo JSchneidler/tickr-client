@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Button,
   Group,
@@ -35,8 +35,6 @@ function TradeForm({ coinId }: OrdersProps) {
   const [quantity, setQuantity] = useState<Decimal>();
   const [quantityType, setQuantityType] = useState(QuantityType.SHARES);
   const [orderType, setOrderType] = useState(OrderType.MARKET);
-  const [cost, setCost] = useState<Decimal>();
-
   const { data: user } = useMeQuery();
   const { data: coin } = useGetCoinQuery(coinId ?? skipToken);
   const { holding } = useGetMyHoldingsQuery(undefined, {
@@ -50,13 +48,11 @@ function TradeForm({ coinId }: OrdersProps) {
     initialValue: undefined,
   });
 
-  useEffect(() => {
-    if (!coin || !quantity) setCost(undefined);
-    else {
-      if (quantityType === QuantityType.SHARES)
-        setCost(new Decimal(quantity).mul(coin.currentPrice));
-      else setCost(new Decimal(quantity).div(coin.currentPrice));
-    }
+  const cost = useMemo(() => {
+    if (!coin || !quantity) return undefined;
+    if (quantityType === QuantityType.SHARES)
+      return new Decimal(quantity).mul(coin.currentPrice);
+    return new Decimal(quantity).div(coin.currentPrice);
   }, [coin, quantity, quantityType]);
 
   const [buyDisabled, sellDisabled] = useMemo(() => {
