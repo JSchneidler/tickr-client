@@ -51,7 +51,7 @@ export class WebSocketClient {
     listener: MessageListener<T>,
   ) {
     if (this._socket.readyState !== WebSocket.OPEN)
-      throw Error("Not connected to WebSocket");
+      throw new Error("Not connected to WebSocket");
 
     const internalListener = (event: MessageEvent<string>) => {
       const message = JSON.parse(event.data) as WebSocketMessage<T>;
