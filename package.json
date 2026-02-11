@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "tsc --noEmit -p tsconfig.app.json && eslint . --fix && pnpm format",
+    "lint": "tsc --noEmit -p tsconfig.app.json && eslint . --fix && bun format",
     "format": "prettier . --write",
     "preview": "vite preview",
     "prepare": "husky"
